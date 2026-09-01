@@ -12,6 +12,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 
@@ -24,7 +25,8 @@ ChartJS.register(
   ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 export interface RegionStats {
@@ -43,112 +45,105 @@ interface RegionChartProps {
 }
 
 export const RegionChart: React.FC<RegionChartProps> = ({ regionName, stats }) => {
-  const labels = ['Дефицит (млн. лв.)', 'Неправомерни договори', 'Подадени сигнали', 'Одитни актове'];
+  const years = stats.trendYears && stats.trendYears.length === 5 
+    ? stats.trendYears 
+    : ['2020', '2021', '2022', '2023', '2024'];
+    
+  const trendData = stats.trendDeficit && stats.trendDeficit.length === 5
+    ? stats.trendDeficit
+    : [20, 50, 100, 180, stats.deficitMillions || 250];
 
-  const dataBar = {
-    labels,
+  const barData = {
+    labels: ['Дефицит (млн. лв.)', 'Неправомерни договори', 'Подадени сигнали', 'Одитни актове'],
     datasets: [
       {
-        label: 'Одитни показатели',
+        label: `Основни одитни показатели: ${regionName}`,
         data: [
-          stats.deficitMillions ?? 120,
-          stats.unauthorizedContracts ?? 14,
-          stats.signalsCount ?? 42,
-          stats.auditsCount ?? 5,
+          stats.deficitMillions ?? 0,
+          stats.unauthorizedContracts ?? 0,
+          stats.signalsCount ?? 0,
+          stats.auditsCount ?? 0
         ],
-        backgroundColor: ['#DC2626', '#EAB308', '#38BDF8', '#10B981'],
-        borderRadius: 4,
-      },
-    ],
+        backgroundColor: [
+          'rgba(220, 38, 38, 0.85)',
+          'rgba(234, 179, 8, 0.85)',
+          'rgba(56, 189, 248, 0.85)',
+          'rgba(16, 185, 129, 0.85)'
+        ],
+        borderColor: [
+          '#DC2626',
+          '#EAB308',
+          '#38BDF8',
+          '#10B981'
+        ],
+        borderWidth: 1.5,
+        borderRadius: 4
+      }
+    ]
   };
 
-  const lineLabels = stats.trendYears || ['2021', '2022', '2023', '2024', '2025'];
-  const dataLine = {
-    labels: lineLabels,
+  const lineData = {
+    labels: years,
     datasets: [
       {
-        label: 'Натрупване на щети (млн. лв.)',
-        data: stats.trendDeficit || [45, 90, 160, 240, 310],
-        borderColor: '#EF4444',
-        backgroundColor: 'rgba(239, 68, 68, 0.2)',
-        tension: 0.35,
+        label: `Прогресия на дефицита (млн. лв.) - ${regionName}`,
+        data: trendData,
         fill: true,
+        borderColor: '#EF4444',
+        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+        tension: 0.35,
         pointBackgroundColor: '#DC2626',
+        pointBorderColor: '#FFFFFF',
+        pointRadius: 4
+      }
+    ]
+  };
+
+  const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#CBD5E1',
+          font: { family: 'var(--font-mono)', size: 11, weight: 700 as const }
+        }
       },
-    ],
+      tooltip: {
+        backgroundColor: '#0F172A',
+        titleColor: '#FFFFFF',
+        bodyColor: '#38BDF8',
+        borderColor: '#334155',
+        borderWidth: 1,
+        padding: 10
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: '#94A3B8', font: { family: 'var(--font-mono)', size: 10 } },
+        grid: { color: '#1E293B' }
+      },
+      y: {
+        ticks: { color: '#94A3B8', font: { family: 'var(--font-mono)', size: 10 } },
+        grid: { color: '#1E293B' }
+      }
+    }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div style={{ backgroundColor: '#020617', padding: '12px', borderRadius: '8px', border: '1px solid #1E293B' }}>
-        <span style={{ fontSize: '0.72rem', color: '#94A3B8', fontWeight: 800, textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
-          📊 Основни одитни показатели: {regionName}
-        </span>
-        <div style={{ height: '180px' }}>
-          <Bar
-            data={dataBar}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  backgroundColor: '#0F172A',
-                  titleColor: '#FFFFFF',
-                  bodyColor: '#38BDF8',
-                  borderColor: '#334155',
-                  borderWidth: 1,
-                },
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                  ticks: { color: '#64748B', font: { size: 10 } },
-                },
-                x: {
-                  grid: { display: false },
-                  ticks: { color: '#94A3B8', font: { size: 9 } },
-                },
-              },
-            }}
-          />
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
+      {/* Bar Chart */}
+      <div style={{ backgroundColor: '#020617', padding: '14px', borderRadius: '8px', border: '1px solid #1E293B', height: '220px' }}>
+        <Bar data={barData} options={commonOptions} />
       </div>
 
-      <div style={{ backgroundColor: '#020617', padding: '12px', borderRadius: '8px', border: '1px solid #1E293B' }}>
-        <span style={{ fontSize: '0.72rem', color: '#F87171', fontWeight: 800, textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
-          📈 Прогресия на фискалните дефицити
-        </span>
+      {/* Progression Line Chart */}
+      <div style={{ backgroundColor: '#020617', padding: '14px', borderRadius: '8px', border: '1px solid #1E293B', height: '200px' }}>
+        <div style={{ fontSize: '0.72rem', color: '#EF4444', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
+          📈 Прогресия на фискалните дефицити (2020–2024 г.)
+        </div>
         <div style={{ height: '160px' }}>
-          <Line
-            data={dataLine}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  backgroundColor: '#0F172A',
-                  titleColor: '#FFFFFF',
-                  bodyColor: '#F87171',
-                  borderColor: '#DC2626',
-                  borderWidth: 1,
-                },
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                  ticks: { color: '#64748B', font: { size: 10 } },
-                },
-                x: {
-                  grid: { display: false },
-                  ticks: { color: '#94A3B8', font: { size: 10 } },
-                },
-              },
-            }}
-          />
+          <Line data={lineData} options={commonOptions} />
         </div>
       </div>
     </div>
