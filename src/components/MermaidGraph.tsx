@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
-import DOMPurify from 'dompurify';
 import { RegionChart } from './RegionChart';
 
 interface NodeIntelligenceModal {
@@ -39,18 +38,22 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
 
     mermaid.initialize({
       startOnLoad: false,
-      theme: 'base',
+      theme: 'dark',
       securityLevel: 'loose',
       fontFamily: 'var(--font-sans)',
+      flowchart: {
+        htmlLabels: true,
+        useMaxWidth: false
+      },
       themeVariables: {
         darkMode: true,
         background: '#070D1E',
-        mainBkg: '#1E293B',
+        mainBkg: '#0F172A',
         nodeBorder: '#38BDF8',
         nodeTextColor: '#FFFFFF',
         textColor: '#FFFFFF',
         lineColor: '#F43F5E',
-        primaryColor: '#1E293B',
+        primaryColor: '#0F172A',
         primaryTextColor: '#FFFFFF',
         primaryBorderColor: '#38BDF8',
         secondaryColor: '#0F172A',
@@ -60,7 +63,7 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
         tertiaryTextColor: '#FFFFFF',
         tertiaryBorderColor: '#FBBF24',
         edgeLabelBackground: '#0F172A',
-        clusterBkg: '#0F172A',
+        clusterBkg: 'rgba(15, 23, 42, 0.65)',
         clusterBorder: '#334155'
       }
     });
@@ -69,28 +72,35 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
       if (containerRef.current) {
         try {
           containerRef.current.innerHTML = '';
-          const uniqueId = `${id}-${Math.random().toString(36).substring(2, 9)}`;
+          const uniqueId = `mermaid_svg_${Math.random().toString(36).substring(2, 9)}`;
           const { svg } = await mermaid.render(uniqueId, chart);
           if (containerRef.current) {
-            const cleanSvg = DOMPurify.sanitize(svg, { USE_PROFILES: { svg: true, svgFilters: true } });
-            containerRef.current.innerHTML = cleanSvg;
+            containerRef.current.innerHTML = svg;
             setRendered(true);
             setLoading(false);
 
             const svgEl = containerRef.current.querySelector('svg');
             if (svgEl) {
+              // Force styles on all SVG elements
+              svgEl.querySelectorAll('foreignObject div, foreignObject span, .node text, .node .label, text').forEach((el) => {
+                (el as HTMLElement).style.color = '#FFFFFF';
+                (el as HTMLElement).style.fill = '#FFFFFF';
+                (el as HTMLElement).style.opacity = '1';
+                (el as HTMLElement).style.visibility = 'visible';
+              });
+
               const nodes = svgEl.querySelectorAll('.node');
               nodes.forEach((node) => {
                 // Hover Effects
                 node.addEventListener('mouseenter', () => {
                   nodes.forEach(n => {
                     if (n !== node) {
-                      (n as HTMLElement).style.opacity = '0.3';
+                      (n as HTMLElement).style.opacity = '0.35';
                       (n as HTMLElement).style.transition = 'opacity 0.2s ease';
                     }
                   });
                   (node as HTMLElement).style.cursor = 'pointer';
-                  (node as HTMLElement).style.filter = 'drop-shadow(0 0 10px #38BDF8)';
+                  (node as HTMLElement).style.filter = 'drop-shadow(0 0 12px #38BDF8)';
                 });
 
                 node.addEventListener('mouseleave', () => {
@@ -138,7 +148,7 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
   }, [chart, id]);
 
   const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.2, 2.4));
-  const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.2, 0.5));
+  const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.2, 0.4));
   const handleZoomReset = () => setZoomLevel(1);
 
   const handleExportPng = () => {
@@ -150,22 +160,20 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
     const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
     const URL = window.URL || window.webkitURL || window;
     const blobURL = URL.createObjectURL(svgBlob);
-    
+
     const image = new Image();
     image.onload = () => {
       const canvas = document.createElement('canvas');
-      const scale = 2;
-      canvas.width = (svgElement.clientWidth || 800) * scale;
-      canvas.height = (svgElement.clientHeight || 500) * scale;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = '#070D1E';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.scale(scale, scale);
-        ctx.drawImage(image, 0, 0);
-        const pngUrl = canvas.toDataURL('image/png');
+      canvas.width = svgElement.clientWidth * 2 || 1200;
+      canvas.height = svgElement.clientHeight * 2 || 800;
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.fillStyle = '#070D1E';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const png = canvas.toDataURL('image/png');
         const downloadLink = document.createElement('a');
-        downloadLink.href = pngUrl;
+        downloadLink.href = png;
         downloadLink.download = `${id}-flow-graph.png`;
         document.body.appendChild(downloadLink);
         downloadLink.click();
@@ -201,7 +209,7 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
           backgroundColor: '#070D1E',
           borderRadius: '10px',
           border: '1px solid #1E293B',
-          minHeight: '360px',
+          minHeight: '480px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -212,9 +220,9 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
         {/* Skeleton Loader during compilation */}
         {loading && (
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center', padding: '2rem' }}>
-            <div style={{ width: '60%', height: '40px', backgroundColor: '#1E293B', borderRadius: '6px', animation: 'pulse 1.5s infinite' }} />
-            <div style={{ width: '80%', height: '80px', backgroundColor: '#0F172A', borderRadius: '6px', animation: 'pulse 1.5s infinite' }} />
-            <div style={{ width: '70%', height: '50px', backgroundColor: '#1E293B', borderRadius: '6px', animation: 'pulse 1.5s infinite' }} />
+            <div style={{ width: '60%', height: '40px', backgroundColor: '#1E293B', borderRadius: '6px' }} />
+            <div style={{ width: '80%', height: '80px', backgroundColor: '#0F172A', borderRadius: '6px' }} />
+            <div style={{ width: '70%', height: '50px', backgroundColor: '#1E293B', borderRadius: '6px' }} />
           </div>
         )}
 
@@ -227,7 +235,7 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
               right: '12px',
               display: 'flex',
               gap: '4px',
-              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+              backgroundColor: 'rgba(15, 23, 42, 0.95)',
               border: '1px solid #334155',
               padding: '4px',
               borderRadius: '6px',
@@ -323,7 +331,7 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
                 gap: '6px'
               }}
             >
-              📥 Свали .PNG (Telegram/Facebook)
+              📸 Свали .PNG (Telegram/Facebook)
             </button>
             <button
               onClick={handleExportSvg}
@@ -332,10 +340,13 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
                 color: '#94A3B8',
                 border: '1px solid #1E293B',
                 borderRadius: '4px',
-                padding: '5px 10px',
+                padding: '5px 12px',
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
               }}
             >
               📄 Векторен .SVG
@@ -344,22 +355,19 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
         </div>
       )}
 
-      {/* Interactive Modal with Chart.js Analytics for Clicked Node */}
+      {/* MODAL INTEL CARD (CHART.JS DEEP DRILLDOWN) */}
       {activeModal && (
         <div 
           style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            inset: 0,
             backgroundColor: 'rgba(2, 6, 23, 0.85)',
             backdropFilter: 'blur(8px)',
-            zIndex: 9999,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '1rem'
+            zIndex: 9999,
+            padding: '1.5rem'
           }}
           onClick={() => setActiveModal(null)}
         >
@@ -370,62 +378,86 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
               borderRadius: '12px',
               maxWidth: '650px',
               width: '100%',
-              padding: '1.8rem',
-              boxShadow: '0 0 50px rgba(56, 189, 248, 0.3)',
-              position: 'relative'
+              padding: '2rem',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.2rem',
+              color: '#F8FAFC'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #1E293B', paddingBottom: '10px', marginBottom: '14px' }}>
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #1E293B', paddingBottom: '12px' }}>
               <div>
-                <span style={{ fontSize: '0.65rem', backgroundColor: '#DC2626', color: '#FFFFFF', padding: '2px 6px', borderRadius: '4px', fontWeight: 900 }}>
-                  ОДИТЕН АНАЛИЗ НА ВЪЗЕЛА
+                <span style={{ fontSize: '0.7rem', backgroundColor: '#DC2626', color: '#FFFFFF', padding: '3px 8px', borderRadius: '4px', fontWeight: 900, fontFamily: 'var(--font-mono)' }}>
+                  ОДИТЕН ВЪЗЕЛ ИНТЕЛ
                 </span>
-                <h3 style={{ fontSize: '1.3rem', fontWeight: 900, color: '#FFFFFF', margin: '6px 0 2px 0', fontFamily: 'var(--font-serif)' }}>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: 900, color: '#FFFFFF', marginTop: '6px', fontFamily: 'var(--font-serif)' }}>
                   {activeModal.title}
                 </h3>
-                <div style={{ fontSize: '0.75rem', color: '#38BDF8', fontFamily: 'var(--font-mono)' }}>
-                  Идентификатор: {activeModal.nodeId}
-                </div>
+                <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontFamily: 'var(--font-mono)' }}>ID: {activeModal.nodeId}</span>
               </div>
               <button
                 onClick={() => setActiveModal(null)}
                 style={{
                   backgroundColor: '#1E293B',
-                  border: '1px solid #334155',
                   color: '#94A3B8',
-                  borderRadius: '6px',
+                  border: 'none',
+                  borderRadius: '50%',
                   width: '32px',
                   height: '32px',
                   cursor: 'pointer',
                   fontWeight: 900,
-                  fontSize: '1.1rem'
+                  fontSize: '1rem'
                 }}
               >
                 ✕
               </button>
             </div>
 
-            {/* Render Full Chart.js Visualizer Inside Modal */}
-            <RegionChart regionName={activeModal.title} stats={activeModal.stats} />
-
-            <div style={{ marginTop: '14px', paddingTop: '10px', borderTop: '1px solid #1E293B', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
-              <span style={{ color: '#64748B' }}>Първичен източник: {activeModal.evidence}</span>
-              <button
-                onClick={() => setActiveModal(null)}
-                style={{
-                  backgroundColor: '#DC2626',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '6px 14px',
-                  fontWeight: 800,
-                  cursor: 'pointer'
-                }}
-              >
-                Затвори Досието
-              </button>
+            {/* Evidence & Metrics */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ backgroundColor: '#020617', padding: '10px 14px', borderRadius: '6px', border: '1px solid #1E293B', fontSize: '0.82rem' }}>
+                <span style={{ color: '#64748B', display: 'block', fontSize: '0.7rem' }}>ОБЕМ НА ПОТОКА:</span>
+                <strong style={{ color: '#EF4444', fontSize: '1.1rem' }}>{activeModal.amount}</strong>
+              </div>
+              <div style={{ backgroundColor: '#020617', padding: '10px 14px', borderRadius: '6px', border: '1px solid #1E293B', fontSize: '0.8rem' }}>
+                <span style={{ color: '#64748B', display: 'block', fontSize: '0.7rem' }}>ДОКАЗАТЕЛСТВЕН ИЗТОЧНИК:</span>
+                <span style={{ color: '#CBD5E1' }}>{activeModal.evidence}</span>
+              </div>
             </div>
+
+            {/* Chart.js Visualization inside Modal */}
+            <div style={{ marginTop: '5px' }}>
+              <RegionChart 
+                regionName={activeModal.title} 
+                stats={{
+                  deficitMillions: activeModal.stats.deficitMillions,
+                  unauthorizedContracts: activeModal.stats.unauthorizedContracts,
+                  signalsCount: activeModal.stats.signalsCount,
+                  auditsCount: activeModal.stats.auditsCount,
+                  trendDeficit: activeModal.stats.trendDeficit
+                }} 
+              />
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setActiveModal(null)}
+              style={{
+                backgroundColor: '#38BDF8',
+                color: '#020617',
+                padding: '10px',
+                borderRadius: '6px',
+                fontWeight: 900,
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.85rem'
+              }}
+            >
+              ЗАТВОРИ ДОСИЕТО ➔
+            </button>
           </div>
         </div>
       )}
