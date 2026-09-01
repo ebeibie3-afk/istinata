@@ -290,6 +290,7 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
 
         <div 
           ref={containerRef} 
+          className="mermaid-container"
           style={{ 
             transform: `scale(${zoomLevel})`,
             transformOrigin: 'center center',
