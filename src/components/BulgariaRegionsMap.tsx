@@ -59,31 +59,37 @@ export const BulgariaRegionsMap: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const regionList = useMemo(() => {
-    return Object.keys(REGION_AUDIT_DATA).map(name => ({ name, ...REGION_AUDIT_DATA[name] }));
+    return Object.keys(REGION_AUDIT_DATA).map(name => ({ name }));
   }, []);
 
   const fuse = useMemo(() => {
     return new Fuse(regionList, {
       keys: ['name'],
-      threshold: 0.35,
+      threshold: 0.35
     });
   }, [regionList]);
 
   const filteredRegions = useMemo(() => {
     if (!searchQuery.trim()) return regionList;
-    return fuse.search(searchQuery).map(r => r.item);
+    return fuse.search(searchQuery).map(result => result.item);
   }, [searchQuery, fuse, regionList]);
 
   useEffect(() => {
     fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
-      .then((r) => r.json())
+      .then((res) => res.json())
       .then((data) => {
         const features = data.features || [];
-        const bg = features.find((f: any) => {
+        let bg = features.find((f: any) => {
           const p = f.properties || {};
           const name = p.ADMIN || p.admin || p.NAME || p.name;
-          return name === 'Bulgaria' || name === 'Republic of Bulgaria' || p.ISO_A3 === 'BGR';
+          return name === 'Bulgaria' || name === 'Republic of Bulgaria';
         });
+        if (!bg) {
+          bg = features.find((f: any) => {
+            const p = f.properties || {};
+            return p.ISO_A3 === 'BGR' || p.iso_a3 === 'BGR' || p.ISO3 === 'BGR';
+          });
+        }
         setGeojson(bg || null);
         setLoading(false);
       })
@@ -166,8 +172,8 @@ export const BulgariaRegionsMap: React.FC = () => {
           ) : (
             <MapContainer center={center} zoom={7} scrollWheelZoom={false} style={{ height: '100%', width: '100%', backgroundColor: '#020617' }}>
               <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               {geojson && <GeoJSON data={geojson} style={style} onEachFeature={onEachFeature} />}
             </MapContainer>

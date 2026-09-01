@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 
-// Dynamic import of Leaflet components to prevent Next.js SSR window is not defined errors
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),
   { ssr: false }
@@ -15,14 +14,6 @@ const TileLayer = dynamic(
 );
 const GeoJSON = dynamic(
   () => import('react-leaflet').then((mod) => mod.GeoJSON),
-  { ssr: false }
-);
-const Marker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Marker),
-  { ssr: false }
-);
-const Popup = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Popup),
   { ssr: false }
 );
 
@@ -39,7 +30,6 @@ export const MapBulgaria: React.FC<MapBulgariaProps> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load GeoJSON for Bulgaria
     fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
       .then((res) => res.json())
       .then((data) => {
@@ -115,8 +105,8 @@ export const MapBulgaria: React.FC<MapBulgariaProps> = ({
         style={{ height: '100%', width: '100%', backgroundColor: '#020617' }}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {bgFeature && (
           <GeoJSON
