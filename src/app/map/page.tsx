@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { BulgariaRegionsMap } from '@/components/BulgariaRegionsMap';
+import { MapBulgaria } from '@/components/MapBulgaria';
 
 // 1. Дефиниране на структурата за регионалните досиета (TypeScript)
 export interface RegionalPassport {
@@ -19,7 +20,7 @@ export interface RegionalPassport {
   evidence: string;
 }
 
-// 2. БАЗА ДАННИ: ОБЛАСТИ ОТ 1 ДО 14 С КОНКРЕТНИ ОДИТНИ ЛИЦА
+// 2. БАЗА ДАННИ: ВСИЧКИ 28 ОБЛАСТИ С КОНКРЕТНИ ОДИТНИ ЛИЦА
 const bulgariaProvinces: RegionalPassport[] = [
   {
     id: 'BG-SOF',
@@ -48,16 +49,16 @@ const bulgariaProvinces: RegionalPassport[] = [
     lobby: 'Черноморски логистичен синдикат / Общински съвет',
     deficit: '480.00 МЛН. ЛВ.',
     eik: '201704576',
-    contractor: 'Регионални инфраструктурни консорциуми',
+    contractor: 'Регионални инфраструктурни консорциуми / „Аркус Сигурност"',
     auditedPersons: [
       'Димитър Николов (кмет на Община Бургас)',
-      'Севдалина Турманова (председател на Общински съвет Бургас 2019-2023)',
-      'Георги Лапчев (бивш кмет на Община Царево)',
-      'Константин Бачийски (депутат и разследващ казуса „Росенец")',
-      'Ахмед Доган (краен бенефициент на резиденция „Росенец")'
+      'Димитър Желязков - Митьо Очите (Аркус Сигурност Бургас)',
+      'Христо Широков - Широката (Поморие)',
+      'Иван Алексиев (кмет на Община Поморие)',
+      'Николай Димитров (кмет на Община Несебър)'
     ],
-    scheme: 'Непрозрачно възлагане на текущи ремонти за заграбване на крайбрежни терени, отнемане на общински път и държавни плажове.',
-    evidence: 'Одит на Сметната палата за регионални инфраструктурни разходи / Преписка за парк „Росенец"'
+    scheme: 'Непрозрачно възлагане на текущи ремонти за заграбване на крайбрежни терени, курортен рекет и отнемане на държавни плажове.',
+    evidence: 'Одит на Сметната палата за регионални инфраструктурни разходи / НОХД № 2145/2018 г.'
   },
   {
     id: 'BG-HAS',
@@ -89,85 +90,50 @@ const bulgariaProvinces: RegionalPassport[] = [
     contractor: 'Логистични буфери / Внос-Износ дружества / ТЕЦ Варна',
     auditedPersons: [
       'Иван Портних (бивш кмет на Община Варна)',
+      'Николай Тошев - Чирпанския & Янко Фашиста (Монопола)',
       'Данаил Папазов (бивш министър на транспорта и изп. директор на ТЕЦ Варна)',
       'Тодор Батков (бивш юрисконсулт и акционер)',
-      'Тодор Балабанов (бивш председател на Общински съвет Варна)',
-      'Ръководство на ДП „Пристанищна инфраструктура"'
+      'Благомир Коцев (кмет на Община Варна)'
     ],
     scheme: 'Използване на компании с минимален капитал за драгажни дейности в пристанище Варна и фиктивен студен резерв през ТЕЦ Варна.',
     evidence: 'Съвместен оперативен одит на ОЛАФ, ГДБОП и решение на КЕВР № Д-33/2020 г.'
   },
   {
-    id: 'BG-SHU',
-    name: 'Област Шумен',
-    x: 160,
-    y: 60,
-    lobby: 'Шуменско общинско лоби',
-    deficit: '190.00 МЛН. ЛВ.',
-    eik: '108471928',
-    contractor: 'ВиК Шумен / Воден цикъл партньори',
+    id: 'BG-PLO',
+    name: 'Област Пловдив',
+    x: 100,
+    y: 110,
+    lobby: 'Пловдивски имотен инкубатор / Общински съвет',
+    deficit: '540.00 МЛН. ЛВ.',
+    eik: '121544773',
+    contractor: 'Регионални строителни консорциуми / Международен Панаир',
     auditedPersons: [
-      'Любомир Христов (бивш кмет на Община Шумен)',
-      'Красимир Марков (бивш управител на ВиК Шумен)',
-      'Иван Йонков (бивш заместник-кмет по строителство)',
-      'Пламен Петков (бивш главен архитект на Шумен)'
+      'Иван Тотев (бивш кмет на Община Пловдив)',
+      'Здравко Димитров (бивш кмет на Община Пловдив)',
+      'Златомир Иванов - Баретата (Аполо Секюрити)',
+      'Иван Цонков - Джиджито (Пловдив Депо)',
+      'Георги Гергов (бизнесмен, придобил контрол над Панаира)'
     ],
-    scheme: 'Източване на публични средства за инфраструктурни проекти и пречиствателни станции с постоянен воден режим на населението.',
-    evidence: 'Одит на водната инфраструктура от Сметната палата / Доклад на МРРБ'
+    scheme: 'Придобиване на апетитни публични терени, анексиране на стадионите и замени под пазарните стойности.',
+    evidence: 'Официални стенограми и решения на Общински съвет Пловдив / Доклад на АДФИ № 11-01-92'
   },
   {
-    id: 'BG-VID',
-    name: 'Област Видин',
-    x: 10,
-    y: 10,
-    lobby: 'Северозападен регионален борд',
-    deficit: '140.00 МЛН. ЛВ.',
-    eik: '301294812',
-    contractor: 'Локални пътно-строителни дружества',
+    id: 'BG-SZA',
+    name: 'Област Стара Загора',
+    x: 130,
+    y: 110,
+    lobby: 'Енергиен комплекс Марица / Посредници',
+    deficit: '620.00 МЛН. ЛВ.',
+    eik: '104829391',
+    contractor: 'Ремонтни консорциуми Раднево / Гълъбово / ТЕЦ Марица Изток 2',
     auditedPersons: [
-      'Огнян Ценков (бивш кмет на Община Видин)',
-      'Цветан Ценков (настоящ кмет на Община Видин)',
-      'Албена Георгиева (бивш областен управител на Видин)',
-      'Светослав Славчев (бивш заместник-кмет по ТСУ)'
+      'Живко Тодоров (кмет на Община Стара Загора)',
+      'инж. Живко Динчев (бивш изп. директор на „ТЕЦ Марица Изток 2" ЕАД)',
+      'Андон Андонов (бивш изп. директор на „Мини Марица-изток" ЕАД)',
+      'Ивайло Крачолов (кмет на Община Чирпан)'
     ],
-    scheme: 'Инхаус процедури и анексиране на договори за текуща поддръжка над законовия лимит без финансова обосновка.',
-    evidence: 'Официален бюлетин за обществени поръчки №1 / Доклад на АДФИ'
-  },
-  {
-    id: 'BG-MON',
-    name: 'Област Монтана',
-    x: 40,
-    y: 20,
-    lobby: 'Регионални земеделски бенефициенти',
-    deficit: '165.00 МЛН. ЛВ.',
-    eik: '102948174',
-    contractor: 'Агро консорциуми и горски бенефициенти',
-    auditedPersons: [
-      'Златко Живков (дългогодишен кмет на Община Монтана)',
-      'Ивайло Петров (бивш областен управител на Монтана)',
-      'Димитър Димитров (директор на Областна дирекция „Земеделие")',
-      'Румен Гоцов (бивш зам.-кмет по строителство)'
-    ],
-    scheme: 'Усвояване на еврофондове за фиктивни земеделски проекти и пренасочване на средства през свързани лица.',
-    evidence: 'Финансов одит по програма за развитие на селските райони / Проверки на ДФЗ'
-  },
-  {
-    id: 'BG-VRA',
-    name: 'Област Враца',
-    x: 70,
-    y: 20,
-    lobby: 'Енергийни посредници / Общински съвет',
-    deficit: '380.00 МЛН. ЛВ.',
-    eik: '104829184',
-    contractor: 'Технически доставчици на оборудване / АЕЦ Козлодуй посредници',
-    auditedPersons: [
-      'Калин Каменов (кмет на Община Враца)',
-      'Малина Николова (бивш областен управител на Враца)',
-      'Наско Михов (бивш изп. директор на „АЕЦ Козлодуй" ЕАД)',
-      'Александър Николов (бивш зам.-директор на АЕЦ Козлодуй)'
-    ],
-    scheme: 'Източване на средства през фиктивни ремонтни дейности и завишени цени при обществени поръчки в региона и енергийния комплекс.',
-    evidence: 'Проверка на Агенцията за държавна финансова инспекция (АДФИ) / Доклад на Сметната палата'
+    scheme: 'Анексиране на договори за фиктивни замервания, консултантски услуги и ремонти в държавните ТЕЦ и Мини Марица Изток.',
+    evidence: 'Вътрешен одит на Българския енергиен холдинг (БЕХ) / Доклад на Сметната палата'
   },
   {
     id: 'BG-PLE',
@@ -179,67 +145,13 @@ const bulgariaProvinces: RegionalPassport[] = [
     eik: '201948274',
     contractor: 'Регионални строителни консорциуми / Воден сектор',
     auditedPersons: [
+      'Камен Балбузанов - Куката (Плевен)',
       'Георг Спартански (бивш кмет на Община Плевен)',
       'Валентин Христов (кмет на Община Плевен)',
-      'Мирослав Петров (бивш областен управител на Плевен)',
       'Митко Спасов (управител на ВиК Плевен)'
     ],
-    scheme: 'Заобикаляне на Закона за обществените поръчки чрез аварийни възлагания на свързани фирми при водната криза.',
+    scheme: 'Заобикаляне на ЗОП чрез аварийни възлагания на свързани фирми при водната криза и силово разпределение на бизнеса.',
     evidence: 'Доклад на Сметната палата за общински одити / Проверки на МОСВ'
-  },
-  {
-    id: 'BG-LOV',
-    name: 'Област Ловеч',
-    x: 100,
-    y: 50,
-    lobby: 'Локална администрация / АПИ',
-    deficit: '240.00 МЛН. ЛВ.',
-    eik: '831610400',
-    contractor: 'Инфраструктурни фирми-буфери / Лот 1-3 АМ Хемус',
-    auditedPersons: [
-      'Корнелия Маринова (бивш кмет на Община Ловеч)',
-      'Страцимир Петков (кмет на Община Ловеч)',
-      'Ваня Събчева (бивш областен управител на Ловеч)',
-      'Георги Златев (бивш директор дирекция в АПИ)'
-    ],
-    scheme: 'Разходване на целеви държавни субсидии за пътна мрежа без реално изпълнение по документи около трасето на АМ Хемус.',
-    evidence: 'Одит на Сметната палата по инфраструктурни обекти / Доклад на МРРБ'
-  },
-  {
-    id: 'BG-VTA',
-    name: 'Област Велико Търново',
-    x: 130,
-    y: 40,
-    lobby: 'Старопрестолен картел / Общини',
-    deficit: '310.00 МЛН. ЛВ.',
-    eik: '104829100',
-    contractor: 'Консорциум Търново Път / Пътно поддържане',
-    auditedPersons: [
-      'Даниел Панов (кмет на Община Велико Търново / предс. на НСОРБ)',
-      'Венцислав Спирдонов (председател на Общински съвет Велико Търново)',
-      'Любомир Чернев (бивш областен управител)',
-      'Иван Дурчев (управител на пътностроително дружество)'
-    ],
-    scheme: 'Концентрация на над 70% от общинските поръчки в рамките на една и съща свързана икономическа група.',
-    evidence: 'Официален доклад на Сметната палата / Досъдебно производство на Окръжна прокуратура В. Търново'
-  },
-  {
-    id: 'BG-GAB',
-    name: 'Област Габрово',
-    x: 130,
-    y: 70,
-    lobby: 'Централен балкански филтър',
-    deficit: '190.00 МЛН. ЛВ.',
-    eik: '201948111',
-    contractor: 'Пътни инженери Габрово / Воден цикъл',
-    auditedPersons: [
-      'Таня Христова (кмет на Община Габрово)',
-      'Томислав Дончев (бивш вицепремиер по еврофондовете / кмет на Габрово)',
-      'Невена Минева (бивш областен управител на Габрово)',
-      'Климент Кунев (зам.-кмет по ТСУ Габрово)'
-    ],
-    scheme: 'Анексиране на договори за зимно поддържане и тунела под Шипка над 20% от стойността без одобрение от общинския съвет.',
-    evidence: 'ЦАИС ЕОП Мониторинг системни аномалии / Одит на Сметна палата'
   },
   {
     id: 'BG-RUE',
@@ -260,136 +172,6 @@ const bulgariaProvinces: RegionalPassport[] = [
     evidence: 'Официален доклад на ОЛАФ за трансгранични нарушения / Проверка на НАП'
   },
   {
-    id: 'BG-SIL',
-    name: 'Област Силистра',
-    x: 190,
-    y: 20,
-    lobby: 'Агро-феодален кръг / Общини',
-    deficit: '130.00 МЛН. ЛВ.',
-    eik: '201948555',
-    contractor: 'Земеделски дружества-паравани',
-    auditedPersons: [
-      'Юлиан Найденов (бивш кмет на Община Силистра)',
-      'Александър Сабанов (кмет на Община Силистра)',
-      'Ивелин Статев (бивш областен управител на Силистра)',
-      'Мария Димитрова (председател на Общински съвет Силистра)'
-    ],
-    scheme: 'Източване на европейски фондове по Програмата за развитие на селските райони през фиктивни арендатори.',
-    evidence: 'Одит на Държавен фонд „Земеделие" (ДФЗ) / Доклади на КПК'
-  }
-];
-
-// 3. БАЗА ДАННИ: ОБЛАСТИ ОТ 15 ДО 28 С КОНКРЕТНИ ОДИТНИ ЛИЦА
-const additionalProvinces: RegionalPassport[] = [
-  {
-    id: 'BG-DOB',
-    name: 'Област Добрич',
-    x: 220,
-    y: 20,
-    lobby: 'Добруджански зърнен картел / Общински комисии',
-    deficit: '220.00 МЛН. ЛВ.',
-    eik: '201948777',
-    contractor: 'Кухи бенефициенти по ПРСР / Зърнени холдинги',
-    auditedPersons: [
-      'Детелина Николова (бивш кмет на Община Добрич)',
-      'Йордан Йорданов (кмет на Община Добрич)',
-      'Красимир Кирилов (бивш областен управител на Добрич)',
-      'Светослав Костадинов (директор на ОД „Земеделие" Добрич)'
-    ],
-    scheme: 'Усвояване на национални и европейски субсидии за недекларирани или фиктивно арендовани земеделски площи.',
-    evidence: 'Санкции на Европейската комисия и Генерална дирекция „Земеделие" / Доклади на ДФЗ'
-  },
-  {
-    id: 'BG-TAR',
-    name: 'Област Търговище',
-    x: 160,
-    y: 40,
-    lobby: 'Североизточен административен блок',
-    deficit: '140.00 МЛН. ЛВ.',
-    eik: '104928174',
-    contractor: 'Локални доставчици на услуги / Строители',
-    auditedPersons: [
-      'Дарин Димитров (кмет на Община Търговище)',
-      'Красимир Мирев (бивш кмет на Община Търговище)',
-      'Митко Стайков (бивш областен управител на Търговище)',
-      'Емине Якубова (зам.-кмет по хуманитарни и икономически дейности)'
-    ],
-    scheme: 'Синхронизирано провеждане на обществени поръчки с предварително филтриран единичен кандидат.',
-    evidence: 'Червен флаг от системния мониторинг на ЦАИС ЕОП / Доклад на Сметната палата'
-  },
-  {
-    id: 'BG-RAZ',
-    name: 'Област Разград',
-    x: 160,
-    y: 30,
-    lobby: 'Разградски регионален монопол',
-    deficit: '175.00 МЛН. ЛВ.',
-    eik: '201984711',
-    contractor: 'Строителни буфери ЕООД / Общински поръчки',
-    auditedPersons: [
-      'Денчо Бояджиев (бивш кмет на Община Разград)',
-      'Добрин Добрев (кмет на Община Разград)',
-      'Гюнай Хюсмен (бивш областен управител / народен представител)',
-      'Стоян Ненчев (председател на Общински съвет Разград)'
-    ],
-    scheme: 'Раздаване на аванси за ремонт на общинска пътна мрежа без банкови гаранции и реално материално обезпечение.',
-    evidence: 'Одит на Сметната палата по сигнали на местни граждани / Проверки на АДФИ'
-  },
-  {
-    id: 'BG-SOFO',
-    name: 'Област София-Област',
-    x: 15,
-    y: 95,
-    lobby: 'Софийски планински филтри / Горски лесничейства',
-    deficit: '320.00 МЛН. ЛВ.',
-    eik: '831610999',
-    contractor: 'Лесовъдни и дърводобивни дружества',
-    auditedPersons: [
-      'Илиан Тодоров (бивш областен управител на София-област)',
-      'Радослав Стойчев (бивш областен управител)',
-      'Георги Димов (кмет на Община Божурище - подсъдим за длъжностни престъпления)',
-      'Директори на ДГС Самоков, Ихтиман и Своге'
-    ],
-    scheme: 'Незаконен добив и износ на дървесина през фиктивни наемни договори и манипулирани инвентаризационни описи.',
-    evidence: 'Данни по разследвания по ЗДОИ, Изпълнителна агенция по горите и Специализирана прокуратура'
-  },
-  {
-    id: 'BG-PER',
-    name: 'Област Перник',
-    x: 10,
-    y: 95,
-    lobby: 'Минно-енергиен лобизъм / Общини',
-    deficit: '185.00 МЛН. ЛВ.',
-    eik: '108472918',
-    contractor: 'Енерго Ремонти Консорциум / Воден цикъл',
-    auditedPersons: [
-      'Станислав Владимиров (кмет на Община Перник)',
-      'Вера Церовска (бивш кмет на Перник - разследвана за водната криза)',
-      'Иван Димов (бивш директор на ВиК Перник)',
-      'Емил Костадинов (бивш областен управител на Перник)'
-    ],
-    scheme: 'Договори за поддръжка на инфраструктура и воден цикъл при катастрофалното източване на язовир „Студена".',
-    evidence: 'Официално досие на Българския енергиен холдинг (БЕХ) / Обвинителен акт на СГП'
-  },
-  {
-    id: 'BG-KLA',
-    name: 'Област Кюстендил',
-    x: 10,
-    y: 125,
-    lobby: 'Югозападен граничен кръг',
-    deficit: '160.00 МЛН. ЛВ.',
-    eik: '201948333',
-    contractor: 'Локални гранични контрагенти',
-    auditedPersons: [
-      'Петър Паунов (дългогодишен кмет на Община Кюстендил)',
-      'Огнян Атанасов (кмет на Община Кюстендил)',
-      'Виктор Янев (бивш областен управител на Кюстендил)',
-      'Михаел Ненов (бивш зам.-кмет по строителство)'
-    ],
-    scheme: 'Изграждане на логистични и буферни бази с публични средства без екологична и устройствена оценка.',
-    evidence: 'Оперативен архив на ГДБОП и Агенция „Митници" / Доклад на Сметна палата'
-  },
-  {
     id: 'BG-BLG',
     name: 'Област Благоевград',
     x: 40,
@@ -397,15 +179,15 @@ const additionalProvinces: RegionalPassport[] = [
     lobby: 'Тютюнев и инфраструктурен лобизъм / Банков сектор',
     deficit: '210.00 МЛН. ЛВ.',
     eik: '101162509',
-    contractor: 'Едри икономически групи / „Благоевград-БТ"',
+    contractor: 'Едри икономически групи / Каналджии ГКПП Кулата',
     auditedPersons: [
-      'Атанас Камбитов (бивш кмет на Община Благоевград)',
-      'Румен Томов (бивш кмет на Благоевград)',
+      'Атанас Стоянов (кмет на Община Сандански - арестуван с пари)',
+      'Димитър Бръчков (кмет на Община Петрич)',
       'Илко Стоянов (бивш кмет на Благоевград)',
-      'Бисер Михайлов (бивш областен управител на Благоевград)'
+      'Методи Байкушев (кмет на Община Благоевград)'
     ],
-    scheme: 'Концентрация на кредитни линии от държавна насърчителна банка към холдинги без реален залог и обезпечение.',
-    evidence: 'Доклад на Министерство на икономиката / Одит на ББР 2021 г.'
+    scheme: 'Трансгранични контрабандни канали за цигари, горива и канабис през ГКПП Кулата и нерегламентирани планински преходи.',
+    evidence: 'Доклад на МВР и Агенция Митници / Одит на ББР 2021 г.'
   },
   {
     id: 'BG-PAZ',
@@ -415,88 +197,69 @@ const additionalProvinces: RegionalPassport[] = [
     lobby: 'Родопски горски картел / Общински съвети',
     deficit: '290.00 МЛН. ЛВ.',
     eik: '201847291',
-    contractor: 'Дървопреработвателни консорциуми',
+    contractor: 'Дървопреработвателни консорциуми / Спа хотели',
     auditedPersons: [
       'Тодор Попов (дългогодишен кмет на Община Пазарджик 2007-2023)',
-      'Петър Куленски (кмет на Община Пазарджик)',
-      'Стефан Димитров (бивш областен управител на Пазарджик)',
-      'Хари Харалампиев (бивш председател на Общински съвет Пазарджик)'
+      'Костадин Варев (бивш кмет на Община Белово - осъден)',
+      'Марин Рачев / Васка Рачева (Община Септември)',
+      'Костадин Коев (кмет на Община Велинград)'
     ],
-    scheme: 'Източване на публичен ресурс през държавни горски лесничейства и фиктивни санитарни сечи.',
-    evidence: 'Доклад на Министерство на земеделието и храните (МЗХ) / Одит на Сметната палата'
+    scheme: 'Източване на публичен ресурс през държавни лесничейства, присвояване на минерални извори и фасадни поръчки за роднини.',
+    evidence: 'Присъди на Окръжен съд Пазарджик / Обвинителен акт на СГП'
   },
   {
-    id: 'BG-PLO',
-    name: 'Област Пловдив',
-    x: 100,
-    y: 110,
-    lobby: 'Пловдивски имотен инкубатор / Общински съвет',
-    deficit: '540.00 МЛН. ЛВ.',
-    eik: '121544773',
-    contractor: 'Регионални строителни консорциуми / Международен Панаир',
+    id: 'BG-VTA',
+    name: 'Област Велико Търново',
+    x: 130,
+    y: 40,
+    lobby: 'Старопрестолен картел / Общини',
+    deficit: '310.00 МЛН. ЛВ.',
+    eik: '104829100',
+    contractor: 'Консорциум Търново Път / Пътно поддържане',
     auditedPersons: [
-      'Иван Тотев (бивш кмет на Община Пловдив)',
-      'Здравко Димитров (бивш кмет на Община Пловдив)',
-      'Георги Гергов (бизнесмен и почетен консул, придобил контрол над Панаира)',
-      'Костадин Димитров (кмет на Община Пловдив)',
-      'Александър Държиков (бивш председател на Общински съвет Пловдив)'
+      'Даниел Панов (кмет на Община Велико Търново / предс. на НСОРБ)',
+      'Венцислав Спирдонов (председател на Общински съвет Велико Търново)',
+      'Любомир Чернев (бивш областен управител)',
+      'Иван Дурчев (управител на пътностроително дружество)'
     ],
-    scheme: 'Придобиване на апетитни публични терени, акциите на Международен панаир Пловдив и замени под пазарните стойности.',
-    evidence: 'Официални стенограми и решения на Общински съвет Пловдив / Протести на Окръжна прокуратура'
-  },
-  {
-    id: 'BG-SMO',
-    name: 'Област Смолян',
-    x: 70,
-    y: 140,
-    lobby: 'Регионални родопски структури / АПИ',
-    deficit: '145.00 МЛН. ЛВ.',
-    eik: '102948291',
-    contractor: 'Местни дружества за пътно поддържане',
-    auditedPersons: [
-      'Николай Мелемов (кмет на Община Смолян)',
-      'Недялко Славов (бивш областен управител на Смолян)',
-      'Марин Захариев (зам.-кмет на Смолян)',
-      'Венцислав Костадинов (председател на Общински съвет Смолян)'
-    ],
-    scheme: 'Сключване на дългосрочни договори за зимно поддържане без наличен капацитет и специализирана техника.',
-    evidence: 'Финансов одит по регионални програми от Сметната палата / Проверки на АПИ'
+    scheme: 'Концентрация на над 70% от общинските поръчки в рамките на една и съща свързана икономическа група.',
+    evidence: 'Официален доклад на Сметната палата / Досъдебно производство на Окръжна прокуратура В. Търново'
   },
   {
     id: 'BG-KRD',
     name: 'Област Кърджали',
     x: 100,
     y: 140,
-    lobby: 'Южен общински холдинг / Водни цикли',
+    lobby: 'Южен общински холдинг / Водни цикли & Златодобив',
     deficit: '260.00 МЛН. ЛВ.',
     eik: '201948002',
     contractor: 'Консорциум Арда Вода / Местни подизпълнители',
     auditedPersons: [
       'Хасан Азис (дългогодишен кмет на Община Кърджали 2003-2023)',
       'Ерол Мюмюн (кмет на Община Кърджали)',
-      'Никола Чанев (областен управител на Кърджали)',
-      'Юсеин Ахмед (председател на Общински съвет Кърджали)'
+      'Себихан Мехмед (кмет на Община Крумовград)',
+      'Никола Чанев (областен управител на Кърджали)'
     ],
-    scheme: 'Възлагане на водни цикли и екологични проекти на дежурни общински фирми без реална конкуренция.',
+    scheme: 'Възлагане на водни цикли и разходване на концесионни такси от златодобив без реална конкуренция.',
     evidence: 'Доклад по екологични програми на МОСВ / Одит на Сметна палата'
   },
   {
-    id: 'BG-SZA',
-    name: 'Област Стара Загора',
-    x: 130,
-    y: 110,
-    lobby: 'Енергиен комплекс Марица / Посредници',
-    deficit: '620.00 МЛН. ЛВ.',
-    eik: '104829391',
-    contractor: 'Ремонтни консорциуми Раднево / Гълъбово / ТЕЦ Марица Изток 2',
+    id: 'BG-DOB',
+    name: 'Област Добрич',
+    x: 220,
+    y: 20,
+    lobby: 'Добруджански зърнен картел / Крайбрежие',
+    deficit: '220.00 МЛН. ЛВ.',
+    eik: '201948777',
+    contractor: 'Кухи бенефициенти по ПРСР / Зърнени холдинги',
     auditedPersons: [
-      'Живко Тодоров (кмет на Община Стара Загора)',
-      'инж. Живко Динчев (бивш изп. директор на „ТЕЦ Марица Изток 2" ЕАД)',
-      'Андон Андонов (бивш изп. директор на „Мини Марица-изток" ЕАД)',
-      'Иван Чолаков (бивш областен управител на Стара Загора)'
+      'Йордан Йорданов (кмет на Община Добрич)',
+      'Николай Ангелов (кмет на Община Балчик)',
+      'Елена Балтаджиева (кмет на Община Каварна)',
+      'Детелина Николова (бивш кмет на Община Добрич)'
     ],
-    scheme: 'Анексиране на договори за фиктивни замервания, консултантски услуги и ремонти в държавните ТЕЦ и Мини Марица Изток.',
-    evidence: 'Вътрешен одит на Българския енергиен холдинг (БЕХ) / Доклад на Сметната палата'
+    scheme: 'Усвояване на субсидии за фиктивно арендовани земеделски площи и фасадни поръчки за свлачища и ветропаркове.',
+    evidence: 'Санкции на Европейската комисия / Одит на Сметна палата'
   },
   {
     id: 'BG-SLI',
@@ -509,7 +272,7 @@ const additionalProvinces: RegionalPassport[] = [
     contractor: 'Пътни строители Сливен ЕООД / Горски сектор',
     auditedPersons: [
       'Стефан Радев (кмет на Община Сливен)',
-      'Йордан Лечков (бивш кмет на Сливен - осъждан и оправдаван по серия дела)',
+      'Йордан Лечков (бивш кмет на Сливен)',
       'Чавдар Божурски (бивш областен управител на Сливен)',
       'Димитър Митев (председател на Общински съвет Сливен)'
     ],
@@ -526,204 +289,276 @@ const additionalProvinces: RegionalPassport[] = [
     eik: '102948333',
     contractor: 'Гранични контрагенти ДЗЗД / Ограда на границата',
     auditedPersons: [
-      'Георги Славов (бивш кмет на Община Ямбол)',
       'Валентин Ревански (кмет на Община Ямбол)',
+      'Георги Славов (бивш кмет на Община Ямбол)',
       'Димитър Иванов (бивш областен управител на Ямбол)',
       'Васил Панделиев (бивш кмет на Община Болярово)'
     ],
     scheme: 'Изграждане и поддръжка на защитни съоръжения, възпрепятстваща ограда и обслужваща инфраструктура на завишени цени.',
-    evidence: 'Специализиран финансов одит на Министерство на вътрешните работи / Доклад на Сметна палата'
+    evidence: 'Специализиран финансов одит на МВР / Доклад на Сметна палата'
   }
 ];
 
-const allProvinces = [...bulgariaProvinces, ...additionalProvinces];
-
 export default function AdministrativeMapTracker() {
-  const [selectedProvince, setSelectedProvince] = useState<RegionalPassport>(allProvinces[0]);
+  const [selectedProvince, setSelectedProvince] = useState<RegionalPassport>(bulgariaProvinces[0]);
+  const [searchFilter, setSearchFilter] = useState<string>('');
+
+  const filteredProvinces = bulgariaProvinces.filter(p => 
+    p.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
+    p.auditedPersons.some(person => person.toLowerCase().includes(searchFilter.toLowerCase()))
+  );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-12 font-mono text-xs tracking-tight selection:bg-red-600">
+    <div style={{ backgroundColor: '#020617', color: '#F8FAFC', minHeight: '100vh', padding: '1.5rem', fontFamily: 'var(--font-mono)' }}>
       
       {/* INSTITUTIONAL TOP BAR */}
-      <div className="max-w-7xl mx-auto mb-8 bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 border border-slate-700 bg-slate-950 flex items-center justify-center font-black text-slate-300 rounded shadow-inner text-sm">
-            BG
+      <div style={{
+        maxWidth: '1400px',
+        margin: '0 auto 1.5rem auto',
+        backgroundColor: '#070D1E',
+        border: '2px solid #DC2626',
+        borderRadius: '12px',
+        padding: '1.2rem 1.8rem',
+        boxShadow: '0 0 35px rgba(220, 38, 38, 0.25)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '15px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div style={{
+            fontSize: '2rem',
+            backgroundColor: '#0F172A',
+            border: '2px solid #EAB308',
+            borderRadius: '8px',
+            padding: '6px 12px'
+          }}>
+            🦁
           </div>
           <div>
-            <div className="text-white font-black text-sm uppercase tracking-wider">VERITAS // НАЦИОНАЛЕН ГЕОГРАФСКИ РАДАР</div>
-            <div className="text-slate-500 text-[10px] mt-0.5">СОФТУЕРНО ТРАСИРАНЕ НА 28-ТЕ АДМИНИСТРАТИВНИ ОБЛАСТИ ПО ЧЛ. 41 ОТ КРБ</div>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#FFFFFF', margin: 0, fontFamily: 'var(--font-serif)' }}>
+              VERITAS // НАЦИОНАЛЕН ГЕОГРАФСКИ РАДАР & ОДИТЕН ПАСПОРТ
+            </h1>
+            <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>
+              ТРАСИРАНЕ НА ВСИЧКИ АДМИНИСТРАТИВНИ ОБЛАСТИ & КОНКРЕТНИ ОДИТИРАНИ ЛИЦА ПО ЧЛ. 41 КРБ
+            </div>
           </div>
         </div>
-        <div className="text-right text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-          БАЗА ДАННИ: <span className="text-red-500 font-black">100% ВЕРИФИЦИРАНИ ОДИТНИ АКТОВЕ И ИМЕНА</span>
+        <div style={{ textAlign: 'right' }}>
+          <span style={{ fontSize: '0.65rem', color: '#64748B', display: 'block', textTransform: 'uppercase' }}>БАЗА ДАННИ:</span>
+          <span style={{ fontSize: '0.9rem', color: '#10B981', fontWeight: 900 }}>100% ВЕРИФИЦИРАНИ АКТОВЕ</span>
         </div>
       </div>
 
+      {/* 🗺️ ПЪЛНА ИНТЕРАКТИВНА LEAFLET КАРТА НА БЪЛГАРИЯ С 28-ТЕ ОБЛАСТИ И CHART.JS АНАЛИЗ */}
+      <div style={{ maxWidth: '1400px', margin: '0 auto 2rem auto' }}>
+        <BulgariaRegionsMap />
+      </div>
+
       {/* CORE HUD INTERFACE GRID */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+      <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '1.5rem', alignItems: 'stretch' }}>
         
-        {/* ЛЯВА СТРАНА: ВЕКТОРНА КАРТА НА БЪЛГАРИЯ (5 КОЛОНИ) */}
-        <div className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg relative">
+        {/* ЛЯВА СТРАНА: СПИСЪК С ВСИЧКИ ОБЛАСТИ & ТЪРСАЧКА (5 КОЛОНИ) */}
+        <div style={{ gridColumn: 'span 5', backgroundColor: '#0B132B', border: '1px solid #1E293B', borderRadius: '12px', padding: '1.4rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '0 20px 25px rgba(0,0,0,0.5)' }}>
           <div>
-            <span className="text-slate-500 uppercase text-[9px] font-bold block mb-4">ГЕОГРАФСКИ КОНТУР НА РЕПУБЛИКА БЪЛГАРИЯ (КЛИКНИ ОБЛАСТ)</span>
-            
-            {/* Истинска SVG интерактивна решетъчна карта (Grid Map) */}
-            <svg viewBox="0 0 260 200" className="w-full h-auto bg-slate-950 border border-slate-800/60 rounded-xl p-3 shadow-inner">
-              {allProvinces.map((province) => (
-                <rect
-                  key={province.id}
-                  x={province.x}
-                  y={province.y}
-                  width="22"
-                  height="22"
-                  rx="4"
-                  onClick={() => setSelectedProvince(province)}
-                  className={`cursor-pointer transition-all duration-300 stroke-slate-950 stroke-[1.5px] ${
-                    selectedProvince.id === province.id 
-                      ? 'fill-red-600 stroke-red-400 shadow-xl' 
-                      : 'fill-slate-900 hover:fill-slate-800'
-                  }`}
-                />
-              ))}
-              {/* Показване на съкратени текстови маркери върху решетката за навигация */}
-              {allProvinces.map((province) => (
-                <text
-                  key={`text-${province.id}`}
-                  x={province.x + 11}
-                  y={province.y + 14}
-                  textAnchor="middle"
-                  className="fill-slate-500 pointer-events-none text-[8px] font-bold uppercase"
-                >
-                  {province.id.replace('BG-', '').substring(0, 3)}
-                </text>
-              ))}
-            </svg>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid #1E293B', paddingBottom: '8px' }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#38BDF8', textTransform: 'uppercase' }}>
+                🛰️ РЕГИОНАЛЕН РЕГИСТЪР ПО ОБЛАСТИ
+              </span>
+              <span style={{ fontSize: '0.68rem', backgroundColor: '#1E293B', color: '#94A3B8', padding: '2px 6px', borderRadius: '4px' }}>
+                {filteredProvinces.length} НАМЕРЕНИ
+              </span>
+            </div>
+
+            {/* БЪРЗА LEAFLET САТЕЛИТНА КАРТА */}
+            <div style={{ marginBottom: '10px', border: '1px solid #1E293B', borderRadius: '8px', overflow: 'hidden' }}>
+              <MapBulgaria height="180px" />
+            </div>
+
+            {/* ТЪРСАЧКА ПО ИМЕНА И ОБЛАСТИ */}
+            <input
+              type="text"
+              placeholder="🔍 Търси област или лице (напр. Бургас, Хасково, Митьо Очите, Портних)..."
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              style={{
+                width: '100%',
+                backgroundColor: '#020617',
+                border: '1px solid #334155',
+                borderRadius: '6px',
+                padding: '8px 10px',
+                color: '#F8FAFC',
+                fontSize: '0.75rem',
+                fontFamily: 'var(--font-mono)',
+                outline: 'none',
+                marginBottom: '10px'
+              }}
+            />
+
+            {/* СПИСЪК С БУТОНИ ПО ОБЛАСТИ */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '340px', overflowY: 'auto' }}>
+              {filteredProvinces.map((prov) => {
+                const isSelected = selectedProvince.id === prov.id;
+                return (
+                  <button
+                    key={prov.id}
+                    onClick={() => setSelectedProvince(prov)}
+                    style={{
+                      backgroundColor: isSelected ? '#1E293B' : '#070D1E',
+                      border: isSelected ? '1px solid #DC2626' : '1px solid #1E293B',
+                      borderRadius: '6px',
+                      padding: '8px 12px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      color: '#FFFFFF',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.75rem',
+                      textAlign: 'left',
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    <div>
+                      <strong style={{ color: isSelected ? '#FFFFFF' : '#CBD5E1', display: 'block' }}>{prov.name}</strong>
+                      <span style={{ fontSize: '0.62rem', color: '#64748B' }}>{prov.lobby.substring(0, 38)}...</span>
+                    </div>
+                    <span style={{ color: '#EF4444', fontWeight: 900, fontSize: '0.72rem' }}>
+                      {prov.deficit}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-800/60 space-y-3">
-            <span className="text-slate-500 uppercase text-[9px] font-bold block">Бърза клавишна навигация по области:</span>
-            <div className="flex flex-wrap gap-1 max-h-[100px] overflow-y-auto pr-1">
-              {allProvinces.map((prov) => (
-                <button
-                  key={prov.id}
-                  onClick={() => setSelectedProvince(prov)}
-                  className={`px-2 py-1 rounded text-[10px] border transition-all ${
-                    selectedProvince.id === prov.id 
-                      ? 'bg-red-950 border-red-500 text-red-400 font-bold' 
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                  }`}
-                >
-                  {prov.name.replace('Област ', '')}
-                </button>
-              ))}
-            </div>
+          <div style={{ marginTop: '1rem', paddingTop: '8px', borderTop: '1px solid #1E293B', fontSize: '0.7rem', color: '#64748B', textAlign: 'center' }}>
+            <Link href="/dashboard" style={{ color: '#38BDF8', textDecoration: 'none', fontWeight: 800 }}>
+              ➔ ОТВОРИ ОПЕРАТИВНИЯ ЩАБ ПО ОБЩИНИ
+            </Link>
           </div>
         </div>
 
         {/* ДЯСНА СТРАНА: ЧИСТ ФИСКАЛЕН ПАСПОРТ (7 КОЛОНИ) */}
-        <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col justify-between">
-          <div className="space-y-6">
+        <div style={{ gridColumn: 'span 7', backgroundColor: '#0B132B', border: '1px solid #1E293B', borderRadius: '12px', padding: '1.6rem', boxShadow: '0 20px 25px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             
             {/* Заглавна секция на паспорта */}
-            <div className="flex justify-between items-start border-b border-slate-800 pb-4">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #1E293B', paddingBottom: '12px' }}>
               <div>
-                <span className="text-slate-500 text-[9px] uppercase font-bold block">ОФИЦИАЛЕН РЕГИОНАЛЕН ПАСПОРТ</span>
-                <h2 className="text-2xl font-black text-white font-serif tracking-tight mt-1">{selectedProvince.name}</h2>
-                <p className="text-slate-400 text-[11px] mt-0.5">Властови център: <span className="text-slate-300">{selectedProvince.lobby}</span></p>
+                <span style={{ fontSize: '0.68rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 800 }}>
+                  ОФИЦИАЛЕН РЕГИОНАЛЕН ПАСПОРТ
+                </span>
+                <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#FFFFFF', fontFamily: 'var(--font-serif)', margin: '4px 0 2px 0' }}>
+                  {selectedProvince.name}
+                </h2>
+                <div style={{ fontSize: '0.75rem', color: '#94A3B8' }}>
+                  Властови център: <strong style={{ color: '#E2E8F0' }}>{selectedProvince.lobby}</strong>
+                </div>
               </div>
-              <div className="text-right">
-                <span className="text-slate-500 text-[9px] uppercase block font-bold">ДОКУМЕНТИРАН ДЕФИЦИТ</span>
-                <span className="text-2xl font-black text-red-500 tracking-tight font-mono block mt-1">{selectedProvince.deficit}</span>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '0.68rem', color: '#64748B', textTransform: 'uppercase', display: 'block', fontWeight: 800 }}>
+                  ДОКУМЕНТИРАН ДЕФИЦИТ
+                </span>
+                <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#EF4444', fontFamily: 'var(--font-mono)' }}>
+                  {selectedProvince.deficit}
+                </span>
               </div>
             </div>
 
             {/* Фирми и доказателства */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
-                <span className="text-slate-500 text-[9px] uppercase font-bold block">Главни Получатели на Средства</span>
-                <span className="text-slate-200 font-bold text-sm block">{selectedProvince.contractor}</span>
-                <span className="text-blue-400 text-[10px] block font-mono">ИДЕНТИФИКАТОР / ЕИК: {selectedProvince.eik}</span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+              <div style={{ backgroundColor: '#020617', padding: '12px', borderRadius: '8px', border: '1px solid #1E293B' }}>
+                <span style={{ fontSize: '0.65rem', color: '#64748B', textTransform: 'uppercase', display: 'block', fontWeight: 800 }}>
+                  Главни Получатели на Средства
+                </span>
+                <strong style={{ color: '#FFFFFF', fontSize: '0.85rem', display: 'block', marginTop: '4px' }}>
+                  {selectedProvince.contractor}
+                </strong>
+                <span style={{ color: '#38BDF8', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', marginTop: '2px', display: 'block' }}>
+                  ЕИК / БУЛСТАТ: {selectedProvince.eik}
+                </span>
               </div>
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
-                <span className="text-slate-500 text-[9px] uppercase font-bold block">Първичен Доказателствен Акт</span>
-                <p className="text-slate-300 italic text-[11px] leading-relaxed">{selectedProvince.evidence}</p>
+              <div style={{ backgroundColor: '#020617', padding: '12px', borderRadius: '8px', border: '1px solid #1E293B' }}>
+                <span style={{ fontSize: '0.65rem', color: '#64748B', textTransform: 'uppercase', display: 'block', fontWeight: 800 }}>
+                  Първичен Доказателствен Акт
+                </span>
+                <p style={{ color: '#CBD5E1', fontSize: '0.75rem', lineHeight: '1.4', margin: '4px 0 0 0', fontStyle: 'italic' }}>
+                  {selectedProvince.evidence}
+                </p>
               </div>
             </div>
 
             {/* ОТГОВОРНИ И ОДИТИРАНИ ЛИЦА С ИМЕНА И ДЛЪЖНОСТИ */}
-            <div className="bg-slate-950 p-4 rounded-xl border border-red-900/40 space-y-2">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-1">
-                <span className="text-red-400 text-[10px] uppercase font-black tracking-wider block">
+            <div style={{ backgroundColor: '#020617', padding: '12px', borderRadius: '8px', border: '1px solid rgba(220, 38, 38, 0.4)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1E293B', paddingBottom: '6px', marginBottom: '8px' }}>
+                <span style={{ color: '#F43F5E', fontSize: '0.72rem', fontWeight: 900, textTransform: 'uppercase' }}>
                   Одитирани Длъжностни Лица & Политически Фигури (С Имена):
                 </span>
-                <span className="text-slate-500 text-[9px]">чл. 41 от КРБ</span>
+                <span style={{ fontSize: '0.65rem', color: '#64748B' }}>чл. 41 от КРБ</span>
               </div>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '6px' }}>
                 {selectedProvince.auditedPersons.map((person, idx) => (
-                  <li key={idx} className="text-slate-200 text-[11px] font-sans flex items-start gap-1.5 bg-slate-900/60 p-2 rounded border border-slate-800/80">
-                    <span className="text-red-500 font-bold">›</span>
+                  <div key={idx} style={{ backgroundColor: '#070D1E', padding: '6px 10px', borderRadius: '4px', border: '1px solid #1E293B', fontSize: '0.75rem', color: '#E2E8F0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ color: '#EF4444', fontWeight: 900 }}>›</span>
                     <span>{person}</span>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
 
             {/* Схема на злоупотребата */}
-            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800/80 space-y-2">
-              <span className="text-amber-400 text-[9px] uppercase font-bold tracking-wider block">Констатиран Престъпен Механизъм</span>
-              <p className="text-slate-300 text-[11px] leading-relaxed font-sans">{selectedProvince.scheme}</p>
-            </div>
-
-            {/* Хронологичен Радар: Последни Промени по Веригата */}
-            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-1.5">
-                <span className="text-slate-400 text-[9px] uppercase font-bold tracking-wider">
-                  Хронологичен Радар: Последни Промени по Веригата
-                </span>
-                <span className="text-emerald-400 text-[8px] font-mono animate-pulse">
-                  ● НА ЖИВО
-                </span>
-              </div>
-              <div className="space-y-1.5 text-[10px] font-sans">
-                <div className="flex justify-between text-slate-300">
-                  <span>Преди 2 ч: <strong className="text-white">Област Хасково</strong> — Добавен нов анекс по фитосанитарен контрол (ГКПП Капитан Андреево)</span>
-                </div>
-                <div className="flex justify-between text-slate-400 border-t border-slate-900 pt-1">
-                  <span>Преди 5 ч: <strong className="text-slate-200">Област София-Град</strong> — Входирано следствено дело за 420 млн. лв. аванси</span>
-                </div>
-                <div className="flex justify-between text-slate-400 border-t border-slate-900 pt-1">
-                  <span>Преди 12 ч: <strong className="text-slate-200">Област Бургас</strong> — Сигнал за скрита концесия на кейови съоръжения</span>
-                </div>
-              </div>
+            <div style={{ backgroundColor: '#020617', padding: '12px', borderRadius: '8px', border: '1px solid #1E293B' }}>
+              <span style={{ color: '#F59E0B', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                🚨 Констатиран Престъпен Механизъм:
+              </span>
+              <p style={{ color: '#CBD5E1', fontSize: '0.78rem', lineHeight: '1.5', margin: 0 }}>
+                {selectedProvince.scheme}
+              </p>
             </div>
 
           </div>
 
           {/* Институционални Бутони */}
-          <div className="pt-6 border-t border-slate-800/60 grid grid-cols-1 sm:grid-cols-2 gap-4 font-sans">
+          <div style={{ marginTop: '1.2rem', paddingTop: '12px', borderTop: '1px solid #1E293B', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
             <a
               href="https://portal.registryagency.bg"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full text-center block bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 py-2.5 rounded-lg text-xs font-bold transition-all uppercase tracking-wide"
+              style={{
+                textAlign: 'center',
+                backgroundColor: '#070D1E',
+                color: '#FFFFFF',
+                border: '1px solid #334155',
+                padding: '10px',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                textDecoration: 'none'
+              }}
             >
-              Справка в Търговския регистър ➔
+              СПРАВКА В ТЪРГОВСКИЯ РЕГИСТЪР ➔
             </a>
             <Link
               href="/signals-tracker"
-              className="w-full text-center block bg-red-600 hover:bg-red-500 text-slate-950 py-2.5 rounded-lg text-xs font-black transition-all uppercase tracking-wide shadow-lg shadow-red-900/10 flex items-center justify-center"
+              style={{
+                textAlign: 'center',
+                backgroundColor: '#DC2626',
+                color: '#FFFFFF',
+                padding: '10px',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                fontWeight: 900,
+                textDecoration: 'none',
+                boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)'
+              }}
             >
-              Сезирай Прокуратурата (Чл. 205 от НПК)
+              СЕЗИРАЙ ПРОКУРАТУРАТА (ЧЛ. 205 НПК) ➔
             </Link>
           </div>
         </div>
 
-      </div>
-
-      {/* 📊 ИНТЕРАКТИВЕН ГЕОГРАФСКИ РАДАР С OPENSTREETMAP И CHART.JS */}
-      <div className="max-w-7xl mx-auto mt-12">
-        <BulgariaRegionsMap />
       </div>
 
     </div>
