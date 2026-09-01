@@ -1,120 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  /* 1. ПРЕМИУМ АНТИКОРУПЦИОННА ПАЛИТРА */
-  --bg-primary: #F4F6F9;
-  --bg-card: #FFFFFF;
-  --bg-dark-hero: #0F172A;
-  --border-color: #E2E8F0;
-  --border-subtle: #EDF2F7;
-  
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #64748B;
-  
-  --brand-navy: #1A2B4C;
-  --brand-blue: #1E40AF;
-  
-  /* Акценти за бутони и етикети */
+  --bg-primary: #020617;
+  --bg-secondary: #0B132B;
+  --card-bg: #0F172A;
+  --border-color: #1E293B;
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
   --accent-crimson: #E11D48;
   --accent-crimson-hover: #BE123C;
-  --accent-alert: #DC2626;
-  --accent-gold: #EAB308;
+  --accent-gold: #F59E0B;
+  --accent-cyan: #38BDF8;
   
-  /* Категорийни Баджове */
-  --badge-infra-bg: #E0E7FF;
-  --badge-infra-text: #3730A3;
-  --badge-energy-bg: #FFEDD5;
-  --badge-energy-text: #C2410C;
-  --badge-health-bg: #DCFCE7;
-  --badge-health-text: #15803D;
-  --badge-eu-bg: #E0F2FE;
-  --badge-eu-text: #0369A1;
-  --badge-procurement-bg: #F3E8FF;
-  --badge-procurement-text: #6B21A8;
-
-  /* Типография */
-  --font-serif: "Merriweather", "Playfair Display", Georgia, "Times New Roman", serif;
-  --font-sans: "Inter", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --badge-infra-bg: rgba(56, 189, 248, 0.15);
+  --badge-infra-text: #38BDF8;
+  --badge-energy-bg: rgba(245, 158, 11, 0.15);
+  --badge-energy-text: #F59E0B;
+  --badge-health-bg: rgba(225, 29, 72, 0.15);
+  --badge-health-text: #E11D48;
+  --badge-eu-bg: rgba(16, 185, 129, 0.15);
+  --badge-eu-text: #10B981;
+  --badge-procurement-bg: rgba(168, 85, 247, 0.15);
+  --badge-procurement-text: #A855F7;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
   background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  line-height: 1.6;
+  color: var(--text-main);
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  overflow-x: hidden;
 }
 
-/* Institutional Typography */
-h1, h2, h3, h4 {
-  font-family: var(--font-serif);
-  color: var(--brand-navy);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+/* Custom scrollbars for data tables and code streams */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
 }
 
-/* High Volume Investigative Cards with Soft Shadow */
-.editorial-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  overflow: hidden;
-}
-
-.editorial-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.09);
-  border-color: #CBD5E1;
-}
-
-/* Financial Counter Dark Box */
-.counter-box-dark {
-  background: #0F172A;
-  border: 1px solid #1E293B;
-  border-radius: 6px;
-  padding: 1.8rem;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Badges */
-.badge-exclusive {
-  background-color: var(--accent-alert);
-  color: #FFFFFF;
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding: 4px 10px;
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
   border-radius: 3px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-family: var(--font-sans);
 }
 
-.badge-tag {
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Utility classes for tactical terminal and dossiers */
+.glow-crimson {
+  box-shadow: 0 0 20px rgba(225, 29, 72, 0.25);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+}
+
+.terminal-border {
+  border: 1px solid var(--border-color);
+  position: relative;
+}
+
+.terminal-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+}
+
+.evidence-stamp {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 8px;
-  border-radius: 3px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+}
+
+.evidence-stamp-red {
+  background-color: rgba(225, 29, 72, 0.2);
+  color: #FDA4AF;
+  border: 1px solid var(--accent-crimson);
+}
+
+.evidence-stamp-amber {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #FDE68A;
+  border: 1px solid var(--accent-gold);
+}
+
+.evidence-stamp-green {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #A7F3D0;
+  border: 1px solid #10B981;
 }
 
 .badge-infra { background: var(--badge-infra-bg); color: var(--badge-infra-text); }
@@ -152,37 +146,48 @@ a {
 
 .mermaid-container svg .node rect,
 .mermaid-container svg .node circle,
-.mermaid-container svg .node polygon {
+.mermaid-container svg .node polygon,
+.mermaid-container svg .node path {
   fill: #0F172A !important;
   stroke: #38BDF8 !important;
   stroke-width: 2px !important;
 }
 
-.mermaid-container svg .node .label,
+.mermaid-container svg text,
 .mermaid-container svg .node text,
+.mermaid-container svg .node .label text,
+.mermaid-container svg .node .label tspan,
 .mermaid-container svg .node foreignObject,
-.mermaid-container svg .node span,
-.mermaid-container svg .node div {
+.mermaid-container svg .node foreignObject div,
+.mermaid-container svg .node foreignObject span,
+.mermaid-container svg .node foreignObject p,
+.mermaid-container svg .cluster text,
+.mermaid-container svg .cluster-label text,
+.mermaid-container svg .cluster-label span {
   color: #FFFFFF !important;
   fill: #FFFFFF !important;
-  font-family: var(--font-sans) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   font-size: 13px !important;
   font-weight: 700 !important;
-  line-height: 1.4 !important;
-  text-align: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
 }
 
 .mermaid-container svg .edgeLabel,
 .mermaid-container svg .edgeLabel span,
-.mermaid-container svg .edgeLabel text {
+.mermaid-container svg .edgeLabel text,
+.mermaid-container svg .edgeLabel tspan {
   background-color: #020617 !important;
   color: #FBBF24 !important;
   fill: #FBBF24 !important;
   font-size: 11px !important;
   font-weight: 800 !important;
-  font-family: var(--font-mono) !important;
+  font-family: monospace !important;
   padding: 2px 6px !important;
   border-radius: 4px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .mermaid-container svg .edgePath path {

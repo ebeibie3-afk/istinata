@@ -38,11 +38,11 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
 
     mermaid.initialize({
       startOnLoad: false,
-      theme: 'dark',
+      theme: 'default',
       securityLevel: 'loose',
-      fontFamily: 'var(--font-sans)',
+      fontFamily: 'sans-serif',
       flowchart: {
-        htmlLabels: true,
+        htmlLabels: false, // SVG pure text rendering ensures no foreignObject CSS collapse
         useMaxWidth: false
       },
       themeVariables: {
@@ -63,7 +63,7 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
         tertiaryTextColor: '#FFFFFF',
         tertiaryBorderColor: '#FBBF24',
         edgeLabelBackground: '#0F172A',
-        clusterBkg: 'rgba(15, 23, 42, 0.65)',
+        clusterBkg: '#0B132B',
         clusterBorder: '#334155'
       }
     });
@@ -81,12 +81,22 @@ export const MermaidGraph: React.FC<MermaidGraphProps> = ({ chart, id = 'mermaid
 
             const svgEl = containerRef.current.querySelector('svg');
             if (svgEl) {
-              // Force styles on all SVG elements
-              svgEl.querySelectorAll('foreignObject div, foreignObject span, .node text, .node .label, text').forEach((el) => {
-                (el as HTMLElement).style.color = '#FFFFFF';
-                (el as HTMLElement).style.fill = '#FFFFFF';
-                (el as HTMLElement).style.opacity = '1';
-                (el as HTMLElement).style.visibility = 'visible';
+              // Inject inline text styles
+              svgEl.querySelectorAll('text, tspan').forEach((el) => {
+                (el as SVGElement).setAttribute('fill', '#FFFFFF');
+                (el as SVGElement).style.fill = '#FFFFFF';
+                (el as SVGElement).style.color = '#FFFFFF';
+                (el as SVGElement).style.fontWeight = '700';
+                (el as SVGElement).style.fontSize = '12px';
+              });
+
+              svgEl.querySelectorAll('rect, polygon, circle').forEach((el) => {
+                const parentNode = (el as SVGElement).closest('.node');
+                if (parentNode) {
+                  (el as SVGElement).setAttribute('fill', '#0F172A');
+                  (el as SVGElement).setAttribute('stroke', '#38BDF8');
+                  (el as SVGElement).setAttribute('stroke-width', '2px');
+                }
               });
 
               const nodes = svgEl.querySelectorAll('.node');
