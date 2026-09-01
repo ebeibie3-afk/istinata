@@ -4,14 +4,17 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { MermaidGraph } from '@/components/MermaidGraph';
 
+// MERMAID DIAGRAM CODE
 const NARCOTICS_NETWORK_MERMAID = `
 graph TD
-    %% Нива и връзки на синдиката
-    subgraph ЧАДЪР ["🏛️ ИНСТИТУЦИОНАЛЕН ЧАДЪР & МАГИСТРАТИ"]
-        A["🏛️ Иван Гешев / Петя Аврамова / Георги Терзийски<br/><b>Висши протекции & Забавени дела</b>"] -->|Кадрови смени / Спиране на преписки| B["👮 Шефове на РУ-МВР / Гранична полиция<br/><b>Оперативно прикритие на терен</b>"]
+    %% Върховно ниво: Чадър & Власт
+    subgraph ВЛАСТ_И_ПРАВОСЪДИЕ ["🔴 НИВО 5: ВЛАСТОВ & СЪДЕБЕН ЧАДЪР"]
+        A["👑 Политически Чадър / Магнитски Субекти<br/><b>Висши политически фигури & Контрабандни квоти</b>"]
+        B["⚖️ Окръжни Прокурори & Началници на ОДМВР<br/><b>Опънат чадър / Прекратени преписки</b>"]
+        A -->|Властови протекции| B
     end
 
-    subgraph ВНОС ["🚢 МОРСКИ & ГРАНИЧЕН ВНОС"]
+    subgraph ТРАФИК_И_ВНОС ["🔵 НИВО 4: МЕЖДУНАРОДЕН ТРАФИК"]
         B -->|Оперативен чадър на границата| C["🚢 Евелин Банев - Брендо / Христофорос Аманатидис - Таки<br/><b>Транзитен Координатор</b>"]
         C -->|Свързани митнически брокери| D["🏢 Кухи фирми-буфери с 2 лв. капитал<br/><b>Фиктивен внос (ЕИК: 204918274)</b>"]
     end
@@ -47,6 +50,9 @@ export interface NarcoActor {
   levelNumber: 1 | 2 | 3 | 4 | 5;
   levelTitle: string;
   colorGrad: string;
+  baseBg: string;
+  borderAccent: string;
+  badgeColor: string;
   widthPct: string;
   jurisdiction: string;
   launderingChannel: string;
@@ -64,8 +70,11 @@ const PYRAMID_LEVELS: NarcoActor[] = [
     id: 'NARCO-LVL5-01',
     levelNumber: 5,
     levelTitle: 'Ниво 5: Институционален Чадър & Власт',
-    colorGrad: 'linear-gradient(90deg, #7F1D1D 0%, #DC2626 100%)',
-    widthPct: '40%',
+    colorGrad: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)',
+    baseBg: '#1C1917',
+    borderAccent: '#EF4444',
+    badgeColor: '#EF4444',
+    widthPct: '42%',
     name: 'Петя Аврамова (МРРБ), Георги Терзийски (АПИ), Иван Гешев (Прокуратура)',
     alias: '„Институционалния Чадър"',
     jurisdiction: 'Национално ниво: Гранични дирекции, Агенция „Митници", Окръжни съдилища',
@@ -79,8 +88,11 @@ const PYRAMID_LEVELS: NarcoActor[] = [
     id: 'NARCO-LVL1-01',
     levelNumber: 4,
     levelTitle: 'Ниво 4: Трафиканти & Международни Вносители',
-    colorGrad: 'linear-gradient(90deg, #991B1B 0%, #EF4444 100%)',
-    widthPct: '55%',
+    colorGrad: 'linear-gradient(135deg, #EA580C 0%, #C2410C 100%)',
+    baseBg: '#1E1B18',
+    borderAccent: '#F97316',
+    badgeColor: '#F97316',
+    widthPct: '56%',
     name: 'Евелин Банев - Брендо / Христофорос Аманатидис - Таки',
     alias: '„Транзитния Координатор"',
     jurisdiction: 'Черноморски регион / Пристанище Варна-Запад / Бургас',
@@ -95,7 +107,10 @@ const PYRAMID_LEVELS: NarcoActor[] = [
     id: 'NARCO-LVL2-01',
     levelNumber: 3,
     levelTitle: 'Ниво 3: Производители & Скрити Лаборатории',
-    colorGrad: 'linear-gradient(90deg, #B45309 0%, #F59E0B 100%)',
+    colorGrad: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+    baseBg: '#1F1D14',
+    borderAccent: '#F59E0B',
+    badgeColor: '#F59E0B',
     widthPct: '70%',
     name: 'Размиг Чакърян - Ами / Красимир Каменов - Къро',
     alias: '„Химика / Синтетика"',
@@ -111,7 +126,10 @@ const PYRAMID_LEVELS: NarcoActor[] = [
     id: 'NARCO-LVL3-01',
     levelNumber: 2,
     levelTitle: 'Ниво 2: Регионални Босове & Силови Лейтенанти (Бургас, Поморие, Несебър)',
-    colorGrad: 'linear-gradient(90deg, #D97706 0%, #FBBF24 100%)',
+    colorGrad: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
+    baseBg: '#0F1E2E',
+    borderAccent: '#38BDF8',
+    badgeColor: '#38BDF8',
     widthPct: '85%',
     name: 'Димитър Желязков (Митьо Очите), Христо Широков (Широката), Венцислав Христов (Лавацата), Радослав Николов (Рачо)',
     alias: '„Черноморската Бригада & Силови Лейтенанти"',
@@ -137,7 +155,10 @@ const PYRAMID_LEVELS: NarcoActor[] = [
     id: 'NARCO-LVL4-01',
     levelNumber: 1,
     levelTitle: 'Ниво 1: Улични Пласьори, Дропъри & Куриерски Канали',
-    colorGrad: 'linear-gradient(90deg, #854D0E 0%, #EAB308 100%)',
+    colorGrad: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+    baseBg: '#0D231E',
+    borderAccent: '#10B981',
+    badgeColor: '#10B981',
     widthPct: '100%',
     name: 'Квартални зареждачи, пеши пласьори, Telegram дропъри и спедиторски куриери (Pigeon Express)',
     alias: '„Уличната Мрежа & Разпределителите на Дребно"',
@@ -241,8 +262,8 @@ export default function InteractiveNarcoticsPyramidPage() {
         <div style={{ maxWidth: '1350px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '2.5rem', alignItems: 'center' }}>
           
           {/* LEFT COLUMN: THE VISUAL PYRAMID STACK */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '100%', padding: '1rem' }}>
-            <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', width: '100%', padding: '1rem' }}>
+            <span style={{ fontSize: '0.78rem', fontFamily: 'var(--font-mono)', color: '#38BDF8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', fontWeight: 800 }}>
               🔺 Кликнете върху ниво за досие:
             </span>
 
@@ -254,25 +275,34 @@ export default function InteractiveNarcoticsPyramidPage() {
                   onClick={() => setSelectedLevel(level)}
                   style={{
                     width: level.widthPct,
-                    minWidth: '240px',
-                    background: isSelected ? level.colorGrad : '#0F172A',
-                    color: isSelected ? '#FFFFFF' : '#94A3B8',
-                    border: isSelected ? '2px solid #FFFFFF' : '1px solid #1E293B',
+                    minWidth: '260px',
+                    background: isSelected ? level.colorGrad : level.baseBg,
+                    color: '#FFFFFF',
+                    border: isSelected ? `2px solid #FFFFFF` : `1.5px solid ${level.borderAccent}`,
                     borderRadius: '8px',
-                    padding: '1rem 1.2rem',
+                    padding: '1.1rem 1.4rem',
                     cursor: 'pointer',
                     fontFamily: 'var(--font-mono)',
-                    fontSize: '0.85rem',
-                    fontWeight: 900,
                     textAlign: 'center',
-                    boxShadow: isSelected ? '0 10px 25px rgba(225, 29, 72, 0.4)' : '0 2px 5px rgba(0,0,0,0.2)',
-                    transform: isSelected ? 'scale(1.04)' : 'scale(1)',
+                    boxShadow: isSelected ? `0 0 25px ${level.borderAccent}88, 0 10px 25px rgba(0,0,0,0.6)` : '0 4px 12px rgba(0,0,0,0.4)',
+                    transform: isSelected ? 'scale(1.05)' : 'scale(1)',
                     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                    opacity: isSelected ? 1 : 0.2
+                    opacity: 1
                   }}
                 >
-                  <div style={{ fontSize: '0.95rem' }}>{level.alias}</div>
-                  <div style={{ fontSize: '0.72rem', opacity: 0.9, marginTop: '2px', fontWeight: 600 }}>
+                  <div style={{ fontSize: '1rem', fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.01em', textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+                    {level.alias}
+                  </div>
+                  <div style={{
+                    fontSize: '0.72rem',
+                    marginTop: '4px',
+                    fontWeight: 800,
+                    display: 'inline-block',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    backgroundColor: isSelected ? 'rgba(0, 0, 0, 0.35)' : 'rgba(0, 0, 0, 0.6)',
+                    color: isSelected ? '#FFFFFF' : level.borderAccent
+                  }}>
                     {level.levelTitle.split(':')[0]}
                   </div>
                 </button>
@@ -284,155 +314,156 @@ export default function InteractiveNarcoticsPyramidPage() {
           <div>
             <div style={{
               backgroundColor: '#0B132B',
-              border: '2px solid #F43F5E',
+              border: `2px solid ${selectedLevel.borderAccent}`,
               borderRadius: '12px',
-              overflow: 'hidden',
+              padding: '2rem',
               boxShadow: '0 20px 30px rgba(0,0,0,0.5)',
-              animation: 'fadeIn 0.2s ease-in-out'
+              position: 'relative'
             }}>
-              
-              {/* Dossier Header */}
-              <div style={{
-                padding: '1.5rem',
-                background: selectedLevel.colorGrad,
-                color: '#FFFFFF',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '10px'
-              }}>
+              {/* DOSSIER HEADER */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px', borderBottom: '1px solid #1E293B', paddingBottom: '1.2rem', marginBottom: '1.5rem' }}>
                 <div>
-                  <span style={{ fontSize: '0.68rem', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', backgroundColor: 'rgba(0,0,0,0.4)', padding: '2px 8px', borderRadius: '4px', fontWeight: 800 }}>
+                  <span style={{
+                    backgroundColor: selectedLevel.badgeColor,
+                    color: '#FFFFFF',
+                    padding: '3px 8px',
+                    borderRadius: '4px',
+                    fontSize: '0.72rem',
+                    fontFamily: 'var(--font-mono)',
+                    fontWeight: 900,
+                    letterSpacing: '0.05em'
+                  }}>
+                    {selectedLevel.levelTitle.toUpperCase()}
+                  </span>
+                  <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#FFFFFF', fontFamily: 'var(--font-serif)', margin: '0.5rem 0 0.2rem 0' }}>
+                    {selectedLevel.name}
+                  </h2>
+                  <span style={{ color: '#F43F5E', fontSize: '0.9rem', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
+                    {selectedLevel.alias}
+                  </span>
+                </div>
+
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '0.7rem', color: '#64748B', fontFamily: 'var(--font-mono)', display: 'block' }}>ИДЕНТИФИКАТОР:</span>
+                  <span style={{ fontSize: '0.85rem', color: '#CBD5E1', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
                     {selectedLevel.id}
                   </span>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: 900, fontFamily: 'var(--font-serif)', margin: '4px 0 0 0' }}>
-                    {selectedLevel.alias}
-                  </h2>
-                  <div style={{ fontSize: '0.78rem', opacity: 0.9, fontStyle: 'italic', fontFamily: 'var(--font-mono)' }}>
-                    ({selectedLevel.name})
-                  </div>
                 </div>
-
-                <span style={{ fontSize: '0.74rem', fontFamily: 'var(--font-mono)', fontWeight: 900, backgroundColor: '#020617', color: '#FBBF24', padding: '4px 10px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }}>
-                  {selectedLevel.levelTitle}
-                </span>
               </div>
 
-              {/* Dossier Body */}
-              <div style={{ padding: '1.8rem', display: 'flex', flexDirection: 'column', gap: '1.2rem', fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}>
-                
-                {/* Box 1: Zone & AML */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
-                  <div style={{ backgroundColor: '#020617', padding: '1rem', borderRadius: '6px', border: '1px solid #1E293B' }}>
-                    <span style={{ fontSize: '0.68rem', color: '#64748B', textTransform: 'uppercase', display: 'block' }}>🗺️ Зона на Влияние:</span>
-                    <strong style={{ color: '#FFFFFF', fontSize: '0.88rem', display: 'block', marginTop: '2px' }}>{selectedLevel.jurisdiction}</strong>
-                  </div>
-
-                  <div style={{ backgroundColor: '#020617', padding: '1rem', borderRadius: '6px', border: '1px solid #1E293B' }}>
-                    <span style={{ fontSize: '0.68rem', color: '#64748B', textTransform: 'uppercase', display: 'block' }}>🧼 Канал за Пране:</span>
-                    <strong style={{ color: '#FBBF24', fontSize: '0.82rem', display: 'block', marginTop: '2px' }}>{selectedLevel.launderingChannel}</strong>
+              {/* DOSSIER METRICS & DATA */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: '#64748B', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                    📍 Териториален Обхват & Юрисдикция:
+                  </span>
+                  <div style={{ color: '#F8FAFC', fontSize: '0.9rem', fontWeight: 600 }}>
+                    {selectedLevel.jurisdiction}
                   </div>
                 </div>
 
-                {/* Box 2: OSINT Red Flag */}
-                <div style={{ backgroundColor: 'rgba(234, 179, 8, 0.08)', border: '1px solid rgba(234, 179, 8, 0.3)', padding: '1rem', borderRadius: '6px' }}>
-                  <span style={{ color: '#FBBF24', fontWeight: 900, display: 'block', fontSize: '0.74rem' }}>🔍 OSINT ЧЕРВЕН ФЛАГ (ДИГИТАЛНА СЛЕДА):</span>
-                  <p style={{ color: '#FDE68A', margin: '4px 0 0 0', lineHeight: '1.5' }}>
-                    {selectedLevel.osintRedFlag}
-                  </p>
+                <div style={{ backgroundColor: '#020617', padding: '1rem', borderRadius: '8px', border: '1px solid #1E293B' }}>
+                  <span style={{ fontSize: '0.72rem', color: '#EF4444', fontFamily: 'var(--font-mono)', fontWeight: 800, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                    🚨 Механизъм за Пране на Пари:
+                  </span>
+                  <div style={{ color: '#CBD5E1', fontSize: '0.88rem', lineHeight: '1.5' }}>
+                    {selectedLevel.launderingChannel}
+                  </div>
+                  {selectedLevel.launderingEik && (
+                    <div style={{ marginTop: '6px', fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: '#38BDF8' }}>
+                      Свързан ЕИК / Буфер: <strong>{selectedLevel.launderingEik}</strong>
+                    </div>
+                  )}
                 </div>
 
-                {/* Box 3: Legal Evidence & Umbrellas */}
-                <div style={{ backgroundColor: '#020617', padding: '1rem', borderRadius: '6px', border: '1px solid #1E293B' }}>
-                  <span style={{ color: '#FB7185', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', display: 'block' }}>⚖️ Доказателствен Акт & Преписки:</span>
-                  <p style={{ color: '#CBD5E1', fontStyle: 'italic', margin: '4px 0 8px 0', lineHeight: '1.4' }}>
+                {/* ASSOCIATED CORPORATE INSTRUMENTS */}
+                {selectedLevel.associatedCompanies && selectedLevel.associatedCompanies.length > 0 && (
+                  <div style={{ backgroundColor: '#020617', padding: '1rem', borderRadius: '8px', border: '1px solid #1E293B' }}>
+                    <span style={{ fontSize: '0.72rem', color: '#EAB308', fontFamily: 'var(--font-mono)', fontWeight: 800, textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                      🏢 Свързани Корпоративни & Охранителни Структури:
+                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {selectedLevel.associatedCompanies.map((comp, idx) => (
+                        <div key={idx} style={{ fontSize: '0.82rem', color: '#CBD5E1', borderLeft: '2px solid #EAB308', paddingLeft: '8px' }}>
+                          <strong style={{ color: '#FFFFFF' }}>{comp.name}</strong> {comp.eik ? `(ЕИК: ${comp.eik})` : ''} — <em>{comp.activity}</em>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* STREET OPERATIONAL UNITS */}
+                {selectedLevel.streetUnits && selectedLevel.streetUnits.length > 0 && (
+                  <div style={{ backgroundColor: '#020617', padding: '1rem', borderRadius: '8px', border: '1px solid #1E293B' }}>
+                    <span style={{ fontSize: '0.72rem', color: '#10B981', fontFamily: 'var(--font-mono)', fontWeight: 800, textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                      👥 Улични Звена & Изпълнители:
+                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {selectedLevel.streetUnits.map((unit, idx) => (
+                        <div key={idx} style={{ fontSize: '0.82rem', color: '#CBD5E1', borderLeft: '2px solid #10B981', paddingLeft: '8px' }}>
+                          <strong style={{ color: '#FFFFFF' }}>{unit.role}:</strong> {unit.names} ({unit.operationArea})
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: '#64748B', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                    ⚖️ Правни & Доказателствени Източници:
+                  </span>
+                  <div style={{ color: '#94A3B8', fontSize: '0.85rem', lineHeight: '1.5', fontStyle: 'italic' }}>
                     {selectedLevel.legalEvidence}
-                  </p>
-
-                  {selectedLevel.associatedCompanies && selectedLevel.associatedCompanies.length > 0 && (
-                    <div style={{ marginBottom: '10px' }}>
-                      <span style={{ color: '#38BDF8', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', display: 'block' }}>🏢 Свързани Фирми & Паравани (ЕИК):</span>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
-                        {selectedLevel.associatedCompanies.map((c, i) => (
-                          <div key={i} style={{ backgroundColor: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem' }}>
-                            <strong style={{ color: '#F8FAFC' }}>{c.name}</strong> {c.eik && <span style={{ color: '#94A3B8' }}>(ЕИК: {c.eik})</span>} — <span style={{ color: '#38BDF8' }}>{c.activity}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedLevel.streetUnits && selectedLevel.streetUnits.length > 0 && (
-                    <div style={{ marginBottom: '10px' }}>
-                      <span style={{ color: '#F43F5E', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', display: 'block' }}>👥 Улични Звена & Дилърски Структури:</span>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
-                        {selectedLevel.streetUnits.map((u, i) => (
-                          <div key={i} style={{ backgroundColor: 'rgba(244, 63, 94, 0.05)', border: '1px solid rgba(244, 63, 94, 0.2)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem' }}>
-                            <span style={{ color: '#F43F5E', fontWeight: 700 }}>{u.role}:</span> <span style={{ color: '#F8FAFC' }}>{u.names}</span> <span style={{ color: '#64748B' }}>({u.operationArea})</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <span style={{ color: '#F59E0B', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', display: 'block' }}>🛡️ Институционален Чадър:</span>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: '4px 0 0 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    {selectedLevel.connectedPoliticians.map((pol, idx) => (
-                      <li key={idx} style={{ color: '#F8FAFC', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F59E0B' }} />
-                        {pol}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Action Link to Commercial Register, Black Book & Secure Whistleblower */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', paddingTop: '10px', borderTop: '1px solid #1E293B' }}>
-                  <a
-                    href={selectedLevel.tradeRegisterUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: '#38BDF8', textDecoration: 'underline', fontSize: '0.78rem' }}
-                  >
-                    🔍 Провери фирмите в Търговския регистър ➔
-                  </a>
-
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <Link
-                      href="/signals-tracker"
-                      style={{
-                        backgroundColor: '#DC2626',
-                        color: '#FFFFFF',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '4px',
-                        fontWeight: 900,
-                        fontSize: '0.78rem',
-                        textDecoration: 'none',
-                        boxShadow: '0 0 15px rgba(220, 38, 38, 0.4)'
-                      }}
-                    >
-                      🛡️ Докладвай локален дилър или чадър (Чл. 205 НПК) ➔
-                    </Link>
-
-                    <Link
-                      href="/persons"
-                      style={{
-                        backgroundColor: '#0F172A',
-                        border: '1px solid #334155',
-                        color: '#FFFFFF',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '4px',
-                        fontWeight: 800,
-                        fontSize: '0.78rem',
-                        textDecoration: 'none'
-                      }}
-                    >
-                      👤 Черната Книга ➔
-                    </Link>
                   </div>
                 </div>
 
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: '#64748B', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                    🚩 Констатиран Червен Флаг:
+                  </span>
+                  <div style={{ color: '#F43F5E', fontSize: '0.85rem', fontWeight: 600 }}>
+                    {selectedLevel.osintRedFlag}
+                  </div>
+                </div>
+              </div>
+
+              {/* ACTION LINKS */}
+              <div style={{ marginTop: '2rem', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <a
+                  href={selectedLevel.tradeRegisterUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    backgroundColor: '#DC2626',
+                    color: '#FFFFFF',
+                    padding: '0.65rem 1.2rem',
+                    borderRadius: '4px',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    fontFamily: 'var(--font-mono)',
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+                  }}
+                >
+                  ПРОВЕРИ В ТЪРГОВСКИЯ РЕГИСТЪР ➔
+                </a>
+
+                <Link
+                  href="/flow-visualizer"
+                  style={{
+                    backgroundColor: '#1E293B',
+                    color: '#38BDF8',
+                    padding: '0.65rem 1.2rem',
+                    borderRadius: '4px',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    fontFamily: 'var(--font-mono)',
+                    textDecoration: 'none',
+                    border: '1px solid #334155'
+                  }}
+                >
+                  ОТВОРИ В ИНТЕРАКТИВНАТА ВЕКТОРНА КАРТА ➔
+                </Link>
               </div>
 
             </div>
@@ -441,24 +472,23 @@ export default function InteractiveNarcoticsPyramidPage() {
         </div>
       )}
 
-      {/* VIEW 2: VECTOR NETWORK GRAPH (MERMAID.JS) */}
+      {/* VIEW 2: FULL VECTOR MERMAID NETWORK GRAPH */}
       {viewTab === 'NETWORK_GRAPH' && (
-        <div style={{ maxWidth: '1350px', margin: '0 auto', backgroundColor: '#0B132B', border: '1px solid #1E293B', borderRadius: '12px', padding: '2rem', boxShadow: '0 20px 30px rgba(0,0,0,0.5)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1E293B', paddingBottom: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '10px' }}>
-            <div>
-              <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#FFFFFF', margin: 0, fontFamily: 'var(--font-mono)' }}>
-                🕸️ Векторна Мрежа на Зависимостите: Наркотрафик, Лаборатории & Чадър
-              </h2>
-              <p style={{ color: '#94A3B8', fontSize: '0.85rem', margin: '4px 0 0 0' }}>
-                Динамична паяжина, показваща реалния път на капиталите, прекурсорите и обратното захранване на властта.
-              </p>
-            </div>
-            <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', backgroundColor: 'rgba(56, 189, 248, 0.1)', color: '#38BDF8', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '3px 8px', borderRadius: '4px' }}>
-              MERMAID.JS RENDERED
+        <div style={{ maxWidth: '1350px', margin: '0 auto', backgroundColor: '#0B132B', border: '1px solid #1E293B', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 20px 30px rgba(0,0,0,0.5)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #1E293B', paddingBottom: '10px' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 900, color: '#38BDF8', letterSpacing: '0.05em', fontFamily: 'var(--font-mono)' }}>
+              🕸️ ВЕКТОРНА СХЕМА НА ЗАВИСИМОСТИТЕ И ВНОСА (MERMAID.JS)
+            </span>
+            <span style={{ fontSize: '0.72rem', color: '#94A3B8', fontFamily: 'var(--font-mono)' }}>
+              * Кликнете върху произволен възел за интерактивен одит
             </span>
           </div>
 
-          <MermaidGraph chart={NARCOTICS_NETWORK_MERMAID} id="narco-network-graph" />
+          <MermaidGraph
+            chart={NARCOTICS_NETWORK_MERMAID}
+            id="narcotics-pyramid-graph"
+            allowExport={true}
+          />
         </div>
       )}
 
