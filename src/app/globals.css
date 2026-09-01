@@ -1,0 +1,145 @@
+:root {
+  /* 1. ПРЕМИУМ АНТИКОРУПЦИОННА ПАЛИТРА */
+  --bg-primary: #F4F6F9;         /* Елегантно светло сиво за тялото на сайта */
+  --bg-card: #FFFFFF;            /* Чисто бели контейнери за новини */
+  --bg-dark-hero: #0F172A;       /* Наситено тъмносин фон за извънредното разследване */
+  --border-color: #E2E8F0;
+  --border-subtle: #EDF2F7;
+  
+  --text-primary: #0F172A;       /* Тъмен цвят за заглавия и текст */
+  --text-secondary: #475569;     /* Сбит текст за подзаглавия */
+  --text-muted: #64748B;
+  
+  --brand-navy: #1A2B4C;         /* Корпоративно тъмносиньо */
+  --brand-blue: #1E40AF;
+  
+  /* Акценти за бутони и етикети */
+  --accent-crimson: #E11D48;     /* #e11d48 - Плътен червен цвят за "ПОДАЙ СИГНАЛ" */
+  --accent-crimson-hover: #BE123C;
+  --accent-alert: #DC2626;       /* Ярко червено за финансови щети и аларми */
+  --accent-gold: #EAB308;        /* Предупредително злато за броячи */
+  
+  /* Категорийни Баджове */
+  --badge-infra-bg: #E0E7FF;
+  --badge-infra-text: #3730A3;
+  --badge-energy-bg: #FFEDD5;
+  --badge-energy-text: #C2410C;
+  --badge-health-bg: #DCFCE7;
+  --badge-health-text: #15803D;
+  --badge-eu-bg: #E0F2FE;
+  --badge-eu-text: #0369A1;
+  --badge-procurement-bg: #F3E8FF;
+  --badge-procurement-text: #6B21A8;
+
+  /* Типография */
+  --font-serif: "Merriweather", "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* Institutional Typography */
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  color: var(--brand-navy);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* High Volume Investigative Cards with Soft Shadow */
+.editorial-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+}
+
+.editorial-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.09);
+  border-color: #CBD5E1;
+}
+
+/* Financial Counter Dark Box */
+.counter-box-dark {
+  background: #0F172A;
+  border: 1px solid #1E293B;
+  border-radius: 6px;
+  padding: 1.8rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Badges */
+.badge-exclusive {
+  background-color: var(--accent-alert);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 3px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-infra { background: var(--badge-infra-bg); color: var(--badge-infra-text); }
+.badge-energy { background: var(--badge-energy-bg); color: var(--badge-energy-text); }
+.badge-health { background: var(--badge-health-bg); color: var(--badge-health-text); }
+.badge-eu { background: var(--badge-eu-bg); color: var(--badge-eu-text); }
+.badge-procurement { background: var(--badge-procurement-bg); color: var(--badge-procurement-text); }
+
+/* Whistleblower Button */
+.btn-whistleblower {
+  background-color: var(--accent-crimson);
+  color: #FFFFFF;
+  padding: 0.65rem 1.4rem;
+  border-radius: 4px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-whistleblower:hover {
+  background-color: var(--accent-crimson-hover);
+  transform: translateY(-1px);
+}

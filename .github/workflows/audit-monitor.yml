@@ -1,0 +1,30 @@
+name: BulNAO Audit Ingestion & Uptime Monitor
+
+on:
+  schedule:
+    # Run every Monday at 08:00 UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+jobs:
+  audit-monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Ping Uptime & Verify Domain
+        run: |
+          echo "Verifying veritras.online availability..."
+          HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" https://veritras.online/ || echo "000")
+          echo "Status Code: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ne "200" ] && [ "$HTTP_STATUS" -ne "301" ] && [ "$HTTP_STATUS" -ne "302" ]; then
+            echo "WARNING: veritras.online returned status $HTTP_STATUS"
+          else
+            echo "SUCCESS: veritras.online is ONLINE and reachable."
+          fi
+
+      - name: BulNAO RSS Feed Keyword Scanner
+        run: |
+          echo "Checking Bulgarian National Audit Office (BulNAO) news & reports..."
+          curl -s https://www.bulnao.government.bg/bg/novini/ | grep -i "отрицателно" || echo "No new negative opinion audits detected this cycle."

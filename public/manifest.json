@@ -1,0 +1,16 @@
+{
+  "name": "VERITAS — Платформа за Граждански Одит",
+  "short_name": "VERITAS",
+  "description": "Независима платформа за граждански одит, разследвания и картиране на злоупотреби с публични средства в Република България съгласно чл. 41 от Конституцията.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#DC2626",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

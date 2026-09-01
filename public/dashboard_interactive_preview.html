@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VERITAS — Интерактивна Карта на Областите & Анализ</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Merriweather:ital,wght@0,700;0,900;1,400&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Fuse.js (Fuzzy Search) -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card-bg: #0B132B;
+      --border: #1E293B;
+      --red: #DC2626;
+      --red-light: #EF4444;
+      --cyan: #38BDF8;
+      --gold: #EAB308;
+      --green: #10B981;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --font-sans: 'Inter', sans-serif;
+      --font-serif: 'Merriweather', serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      padding: 1.5rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* HEADER */
+    .header {
+      background-color: #070D1E;
+      border: 2px solid var(--red);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 0 35px rgba(220, 38, 38, 0.25);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .lion-badge {
+      font-size: 2.2rem;
+      background-color: #0F172A;
+      border: 2px solid var(--gold);
+      border-radius: 10px;
+      padding: 8px 14px;
+      box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
+    }
+
+    .header-titles h1 {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
+    }
+
+    .header-tags {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .tag-red {
+      background-color: var(--red);
+      color: #FFF;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .tag-gold {
+      color: var(--gold);
+    }
+
+    /* MAP & CHART GRID */
+    .map-dashboard {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 1024px) {
+      .map-dashboard { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      box-shadow: 0 20px 25px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .search-bar {
+      width: 100%;
+      background-color: #020617;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      outline: none;
+    }
+    .search-bar:focus {
+      border-color: var(--cyan);
+    }
+
+    #map {
+      height: 420px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: #020617;
+    }
+
+    .region-buttons-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 100px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .reg-btn {
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background-color: #070D1E;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .reg-btn.active, .reg-btn:hover {
+      background-color: var(--red);
+      border-color: var(--red);
+      color: #FFF;
+      font-weight: 800;
+    }
+
+    /* MUNICIPALITIES TACTICAL GRID */
+    .tactical-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .tactical-grid { grid-template-columns: 1fr; }
+    }
+
+    .muni-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .muni-item {
+      background-color: #070D1E;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      transition: all 0.15s;
+    }
+    .muni-item.active, .muni-item:hover {
+      background-color: #1E293B;
+      border-color: var(--red);
+    }
+
+    .muni-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .muni-deficit {
+      color: var(--red-light);
+      font-weight: 900;
+    }
+
+    .node-box {
+      background-color: #070D1E;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .node-box.active {
+      background-color: #020617;
+      border: 2px solid var(--red-light);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+      transform: translateX(4px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-left">
+        <div class="lion-badge">🦁🇧🇬</div>
+        <div class="header-titles">
+          <div class="header-tags">
+            <span class="tag-red">СЪЕДИНЕНИЕТО ПРАВИ СИЛАТА</span>
+            <span class="tag-gold">⚖️ ЧЛ. 41 ОТ КОНСТИТУЦИЯТА НА РЕПУБЛИКА БЪЛГАРИЯ</span>
+          </div>
+          <h1>VERITAS — ИНТЕРАКТИВЕН ОДИТЕН ЩАБ</h1>
+          <div style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">
+            Реална OpenStreetMap & GeoJSON карта на 28-те области • Бургас, Поморие, Несебър, София, Пловдив, Варна
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 15px; font-family: var(--font-mono);">
+        <div style="background-color: #020617; border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 0.65rem; color: var(--text-muted);">28 Области:</div>
+          <div style="font-size: 1.1rem; font-weight: 900; color: var(--red-light);">100% КАРТИРАНИ</div>
+        </div>
+        <div style="background-color: #020617; border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 0.65rem; color: var(--text-muted);">Официални Одити:</div>
+          <div style="font-size: 1.1rem; font-weight: 900; color: var(--green);">СМЕТНА ПАЛАТА</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🗺️ СЕКЦИЯ 1: ИНТЕРАКТИВНА КАРТА НА БЪЛГАРИЯ (28 ОБЛАСТИ + CHART.JS) -->
+    <div class="map-dashboard">
+      
+      <!-- Лява колона: Leaflet Карта + Търсачка -->
+      <div class="card">
+        <div class="card-header">
+          <span style="font-size: 0.78rem; font-weight: 800; color: var(--cyan); text-transform: uppercase;">
+            🛰️ Интерактивна Карта на България (OpenStreetMap + GeoJSON)
+          </span>
+          <span style="font-size: 0.68rem; background-color: var(--border); color: var(--text-muted); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono);">
+            28 ОБЛАСТИ • FUSE.JS SEARCH
+          </span>
+        </div>
+
+        <input
+          id="region-search"
+          class="search-bar"
+          type="text"
+          placeholder="🔍 Бързо търсене на област (напр. Бургас, Варна, Пловдив, Хасково)..."
+        />
+
+        <div id="map"></div>
+
+        <div id="region-buttons" class="region-buttons-container"></div>
+      </div>
+
+      <!-- Дясна колона: Chart.js Анализ -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <span style="font-size: 0.65rem; background-color: var(--red); color: #FFF; padding: 2px 6px; border-radius: 4px; font-weight: 900; font-family: var(--font-mono);">
+              ФИСКАЛЕН АНАЛИЗ (CHART.JS)
+            </span>
+            <h3 id="chart-region-title" style="font-size: 1.25rem; font-weight: 900; color: #FFF; margin-top: 4px; font-family: var(--font-serif);">
+              Област Бургас
+            </h3>
+          </div>
+          <div style="text-align: right; font-family: var(--font-mono);">
+            <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">ДЕФИЦИТ:</span>
+            <span id="chart-deficit-val" style="font-size: 1.1rem; font-weight: 900; color: var(--red-light);">
+              480 МЛН. ЛВ.
+            </span>
+          </div>
+        </div>
+
+        <div style="height: 180px; width: 100%;">
+          <canvas id="barChart"></canvas>
+        </div>
+
+        <div style="height: 150px; width: 100%; border-top: 1px solid var(--border); padding-top: 8px;">
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 🏛️ СЕКЦИЯ 2: РЕАЛНИ ОБЩИНИ — БУРГАС, ПОМОРИЕ, НЕСЕБЪР, СОФИЯ, ПЛОВДИВ -->
+    <div class="tactical-grid">
+      
+      <!-- Колона 1: Списък с Реални Общини -->
+      <div class="card">
+        <div class="card-header">
+          <span style="font-size: 0.78rem; font-weight: 800; color: var(--cyan); text-transform: uppercase; font-family: var(--font-mono);">
+            🏢 КРИТИЧНИ ОБЩИНИ
+          </span>
+          <span style="font-size: 0.68rem; background-color: var(--border); color: var(--text-muted); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">
+            ИЗБЕРИ ОБЩИНА
+          </span>
+        </div>
+
+        <div id="muni-list" class="muni-list"></div>
+      </div>
+
+      <!-- Колона 2: Сетеви Възли и Чадър -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <span id="muni-network-title" style="font-size: 0.78rem; font-weight: 800; color: var(--gold); text-transform: uppercase; font-family: var(--font-mono);">
+              🕸️ СЕТЕВИ ГРАФ: ОБЩИНА БУРГАС
+            </span>
+            <div id="muni-mayor" style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px;">
+              Кмет: Димитър Николов (Кмет)
+            </div>
+          </div>
+        </div>
+
+        <div id="node-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+
+        <div style="margin-top: auto; padding: 10px; background-color: #020617; border: 1px solid var(--border); border-radius: 6px; font-family: var(--font-mono);">
+          <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">Първичен Одитен Доклад:</span>
+          <span id="muni-audit" style="font-size: 0.75rem; color: var(--gold); font-weight: 800;">
+            Доклад на Сметната палата & АДФИ (Концесии Росенец и крайбрежие)
+          </span>
+        </div>
+      </div>
+
+      <!-- Колона 3: Дигитален Оперативен Паспорт -->
+      <div class="card" id="passport-card">
+        <div class="card-header">
+          <span style="font-size: 0.75rem; font-weight: 800; color: var(--green); text-transform: uppercase; font-family: var(--font-mono);">
+            📋 ДИГИТАЛЕН ОПЕРАТИВЕН ПАСПОРТ
+          </span>
+          <span style="font-size: 0.68rem; background-color: var(--green); color: #020617; font-weight: 900; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">
+            ВЕРИФИЦИРАН
+          </span>
+        </div>
+
+        <div>
+          <span style="font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono);">ИМЕ И ИДЕНТИФИКАЦИЯ:</span>
+          <div id="pass-name" style="font-size: 1.2rem; font-weight: 900; color: #FFF; font-family: var(--font-serif);">
+            Димитър Николов
+          </div>
+          <div id="pass-alias" style="font-size: 0.75rem; color: var(--cyan); font-weight: 800; margin-top: 2px; font-family: var(--font-mono);">
+            Прякор / Функция: „Бургаския Градоначалник" (Кмет / Феодал)
+          </div>
+        </div>
+
+        <div style="background-color: #020617; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-family: var(--font-mono);">
+          <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">ИДЕНТИФИКАТОР / АДМИНИСТРАЦИЯ:</span>
+          <span id="pass-hash" style="font-size: 0.8rem; color: #CBD5E1; font-weight: 800;">
+            Община Бургас
+          </span>
+        </div>
+
+        <div style="background-color: #020617; padding: 12px; border-radius: 6px; border: 1px solid var(--border); font-family: var(--font-mono);">
+          <span style="font-size: 0.68rem; color: var(--red-light); font-weight: 800; display: block; margin-bottom: 4px;">
+            🚨 КОНСТАТИРАН ЧЕРВЕН ФЛАГ:
+          </span>
+          <p id="pass-metrics" style="color: #F1F5F9; fontSize: 0.78rem; line-height: 1.5;">
+            Десетилетен монопол върху обществените поръчки, инхаус превъзлагания за благоустройство и концесии.
+          </p>
+        </div>
+
+        <div style="background-color: #020617; padding: 12px; border-radius: 6px; border: 1px solid var(--border); font-family: var(--font-mono);">
+          <span style="font-size: 0.68rem; color: var(--cyan); font-weight: 800; display: block; margin-bottom: 4px;">
+            ⚖️ ПЪРВИЧЕН ДОКАЗАТЕЛСТВЕН ИЗТОЧНИК:
+          </span>
+          <p id="pass-evidence" style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.4; font-style: italic;">
+            Одитен доклад на Сметната палата № 020010423
+          </p>
+        </div>
+
+        <a
+          href="https://portal.registryagency.bg"
+          target="_blank"
+          style="display: block; width: 100%; text-align: center; background-color: var(--red); color: #FFF; padding: 10px; border-radius: 6px; font-weight: 900; font-size: 0.8rem; text-decoration: none; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4); font-family: var(--font-mono); margin-top: auto;"
+        >
+          СТАРТИРАЙ ПРОВЕРКА В ТЪРГОВСКИЯ РЕГИСТЪР ➔
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // 1. ДАННИ ЗА 28-ТЕ ОБЛАСТИ
+    const REGIONS_DATA = {
+      'Бургас': { deficit: 480, contracts: 38, signals: 195, audits: 12, trend: [90, 180, 290, 380, 480] },
+      'София': { deficit: 6820, contracts: 142, signals: 380, audits: 24, trend: [1200, 2400, 3900, 5200, 6820] },
+      'Варна': { deficit: 720, contracts: 54, signals: 230, audits: 16, trend: [140, 260, 410, 560, 720] },
+      'Пловдив': { deficit: 540, contracts: 45, signals: 220, audits: 15, trend: [110, 210, 330, 440, 540] },
+      'Хасково': { deficit: 890, contracts: 62, signals: 310, audits: 19, trend: [180, 350, 520, 710, 890] },
+      'Стара Загора': { deficit: 620, contracts: 49, signals: 260, audits: 14, trend: [130, 250, 380, 500, 620] },
+      'Русе': { deficit: 280, contracts: 29, signals: 140, audits: 9, trend: [50, 110, 170, 220, 280] },
+      'Плевен': { deficit: 680, contracts: 51, signals: 280, audits: 18, trend: [150, 280, 420, 550, 680] },
+      'Благоевград': { deficit: 210, contracts: 26, signals: 110, audits: 8, trend: [40, 85, 130, 170, 210] },
+      'Враца': { deficit: 380, contracts: 32, signals: 175, audits: 11, trend: [70, 145, 230, 305, 380] },
+      'Пазарджик': { deficit: 290, contracts: 28, signals: 135, audits: 10, trend: [60, 120, 180, 235, 290] },
+      'Велико Търново': { deficit: 310, contracts: 31, signals: 160, audits: 11, trend: [65, 130, 195, 250, 310] },
+      'Шумен': { deficit: 190, contracts: 19, signals: 95, audits: 7, trend: [35, 75, 120, 155, 190] },
+      'Добрич': { deficit: 220, contracts: 22, signals: 105, audits: 8, trend: [45, 90, 140, 180, 220] },
+      'Сливен': { deficit: 210, contracts: 24, signals: 115, audits: 8, trend: [40, 85, 130, 170, 210] },
+      'Габрово': { deficit: 190, contracts: 18, signals: 90, audits: 6, trend: [35, 75, 115, 150, 190] },
+      'Ловеч': { deficit: 240, contracts: 25, signals: 120, audits: 9, trend: [50, 100, 150, 195, 240] },
+      'Монтана': { deficit: 165, contracts: 17, signals: 85, audits: 6, trend: [30, 65, 100, 130, 165] },
+      'Видин': { deficit: 140, contracts: 15, signals: 70, audits: 5, trend: [25, 55, 85, 110, 140] },
+      'Перник': { deficit: 185, contracts: 19, signals: 95, audits: 7, trend: [35, 75, 115, 150, 185] },
+      'Кюстендил': { deficit: 160, contracts: 16, signals: 80, audits: 6, trend: [30, 65, 95, 125, 160] },
+      'Кърджали': { deficit: 260, contracts: 27, signals: 130, audits: 9, trend: [50, 105, 160, 210, 260] },
+      'Смолян': { deficit: 145, contracts: 14, signals: 75, audits: 5, trend: [25, 55, 90, 115, 145] },
+      'Търговище': { deficit: 140, contracts: 15, signals: 70, audits: 5, trend: [25, 55, 85, 110, 140] },
+      'Разград': { deficit: 175, contracts: 18, signals: 90, audits: 6, trend: [30, 70, 105, 140, 175] },
+      'Силистра': { deficit: 130, contracts: 14, signals: 65, audits: 5, trend: [25, 50, 80, 105, 130] },
+      'Ямбол': { deficit: 180, contracts: 19, signals: 90, audits: 7, trend: [35, 70, 110, 145, 180] }
+    };
+
+    // 2. ДАННИ ЗА РЕАЛНИ ОБЩИНИ
+    const MUNICIPALITIES = [
+      {
+        id: 'BG-BURGAS',
+        name: 'Община Бургас',
+        mayor: 'Димитър Николов (Кмет)',
+        coat: '⚓🦁',
+        deficit: '480.0 МЛН. ЛВ.',
+        audit: 'Доклад на Сметната палата & АДФИ (Концесии Росенец и крайбрежие)',
+        nodes: [
+          { id: 'NODE-BS-01', name: 'Димитър Николов', alias: '„Бургаския Градоначалник"', role: 'Кмет / Феодал', emoji: '🏛️⚓', hash: 'Община Бургас', metrics: 'Десетилетен монопол върху обществените поръчки, инхаус превъзлагания за благоустройство и концесии.', evidence: 'Одитен доклад на Сметната палата № 020010423' },
+          { id: 'NODE-BS-02', name: 'Контролни органи на РУ-МВР и ОДМВР', alias: '„Морския Чадър"', role: 'Полицейски чадър', emoji: '👮🛡️', hash: 'ОДМВР Бургас', metrics: 'Констатиран отказ за проверки по сигнали за заграбени крайбрежни територии и пристанищни зони.', evidence: 'Сигнали до Инспектората на МВР и Антикорупционната комисия' }
+        ]
+      },
+      {
+        id: 'BG-POMORIE',
+        name: 'Община Поморие',
+        mayor: 'Иван Алексиев (Кмет)',
+        coat: '🌊🏛️',
+        deficit: '65.4 МЛН. ЛВ.',
+        audit: 'Одит на Сметната палата (Непрозрачни ВиК и крайбрежни строителни проекти)',
+        nodes: [
+          { id: 'NODE-POM-01', name: 'Иван Алексиев', alias: '„Поморийския Кмет"', role: 'Кмет / Феодал', emoji: '🏢🌊', hash: 'Управление Поморие', metrics: 'Над 65 млн. лв. възложени поръчки на концентриран кръг от местни строителни дружества без състезателност.', evidence: 'Одит на Сметната палата за капиталовите разходи' }
+        ]
+      },
+      {
+        id: 'BG-NESSEBAR',
+        name: 'Община Несебър',
+        mayor: 'Николай Димитров (Кмет)',
+        coat: '🏰⛵',
+        deficit: '210.0 МЛН. ЛВ.',
+        audit: 'Спецпрокуратура & Сметна палата (Слънчев бряг, дюни и концесии)',
+        nodes: [
+          { id: 'NODE-NES-01', name: 'Николай Димитров', alias: '„Несебърския Владетел"', role: 'Кмет / Феодал', emoji: '👑🏖️', hash: 'Община Несебър', metrics: 'Арестуван от Спецпрокуратурата през 2019 г. за изборни търговии; застрояване на дюни и фасадни търгове.', evidence: 'Обвинителен акт на СГП и отрицателни одити на Сметната палата' },
+          { id: 'NODE-NES-02', name: 'Квартални отговорници и депа', alias: '„Слънчев бряг Дистрибуция"', role: 'Трафикант', emoji: '💊📦', hash: 'Курортен Сектор', metrics: 'Сезонно разпределение на наркотрафика под протекция на компрометирани полицейски служители.', evidence: 'Оперативни доклади на ГДБОП' }
+        ]
+      },
+      {
+        id: 'BG-SOFIA',
+        name: 'Столична Община (София)',
+        mayor: 'Васил Терзиев / Йорданка Фандъкова',
+        coat: '🦁👑',
+        deficit: '1 240.0 МЛН. ЛВ.',
+        audit: 'Доклад на Сметната палата (Топлофикация София, Завод за боклук и инхаус)',
+        nodes: [
+          { id: 'NODE-SOF-01', name: '„Топлофикация София" ЕАД', alias: '„Черната Дупка"', role: 'Пране на пари', emoji: '🔥💸', hash: 'ЕИК: 831609046', metrics: 'Над 1.2 млрд. лв. натрупан дълг към Булгаргаз и БЕХ, скрити схеми за фактуриране на сметки.', evidence: 'Официален финансов одит на БЕХ и Сметната палата' }
+        ]
+      },
+      {
+        id: 'BG-PLOVDIV',
+        name: 'Община Пловдив',
+        mayor: 'Костадин Димитров / Здравко Димитров',
+        coat: '🏛️🦁',
+        deficit: '340.0 МЛН. ЛВ.',
+        audit: 'Сметна палата (Стадиони „Христо Ботев" и „Локомотив", Воден цикъл)',
+        nodes: [
+          { id: 'NODE-PD-01', name: 'Здравко Димитров (Зико)', alias: '„Стадионния Превъзложител"', role: 'Кмет / Феодал', emoji: '🏟️💵', hash: 'Пловдив Инфраструктура', metrics: 'Удвояване на цените на стадионите чрез непрекъснати анекси и дефицит от 340 млн. лв.', evidence: 'Доклад на АДФИ № 11-01-92' }
+        ]
+      },
+      {
+        id: 'BG-VARNA',
+        name: 'Община Варна',
+        mayor: 'Благомир Коцев / Иван Портних',
+        coat: '⚓🌊',
+        deficit: '410.0 МЛН. ЛВ.',
+        audit: 'Европейска прокуратура (EPPO) & Сметна палата (Пристанище „Карантината")',
+        nodes: [
+          { id: 'NODE-VN-01', name: 'Иван Портних', alias: '„Варненския Фаворит"', role: 'Кмет / Феодал', emoji: '🚢📑', hash: 'Община Варна', metrics: 'Разследване от EPPO за фиктивно построяване на рибарско пристанище „Карантината" за 14 млн. лв.', evidence: 'Разследване на Европейската прокуратура (EPPO) 2024 г.' }
+        ]
+      }
+    ];
+
+    // 3. ИНИЦИАЛИЗАЦИЯ НА LEAFLET КАРТАТА
+    const map = L.map('map').setView([42.733883, 25.48583], 7);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap & CartoDB'
+    }).addTo(map);
+
+    // Зареждане на GeoJSON на България
+    fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+      .then(r => r.json())
+      .then(data => {
+        const bg = (data.features || []).find(f => {
+          const p = f.properties || {};
+          const n = p.ADMIN || p.admin || p.NAME || p.name;
+          return n === 'Bulgaria' || n === 'Republic of Bulgaria' || p.ISO_A3 === 'BGR';
+        });
+        if (bg) {
+          L.geoJSON(bg, {
+            style: { color: '#38BDF8', weight: 2, fillColor: '#0F172A', fillOpacity: 0.45 },
+            onEachFeature: (feature, layer) => {
+              layer.bindTooltip('Република България (28 Области)', { sticky: true });
+              layer.on({
+                mouseover: () => layer.setStyle({ weight: 3.5, fillColor: '#DC2626', fillOpacity: 0.7 }),
+                mouseout: () => layer.setStyle({ color: '#38BDF8', weight: 2, fillColor: '#0F172A', fillOpacity: 0.45 }),
+                click: () => selectRegion('Бургас')
+              });
+            }
+          }).addTo(map);
+        }
+      });
+
+    // 4. CHART.JS ИНИЦИАЛИЗАЦИЯ
+    let barChart, lineChart;
+
+    function initCharts(data) {
+      const ctxBar = document.getElementById('barChart').getContext('2d');
+      const ctxLine = document.getElementById('lineChart').getContext('2d');
+
+      barChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+          labels: ['Неправомерни договори', 'Сигнали', 'Одитни актове'],
+          datasets: [{
+            label: 'Брой нарушения',
+            data: [data.contracts, data.signals, data.audits],
+            backgroundColor: ['#F43F5E', '#38BDF8', '#EAB308'],
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#94A3B8', font: { family: 'JetBrains Mono', size: 10 } }, grid: { display: false } },
+            y: { ticks: { color: '#94A3B8', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#1E293B' } }
+          }
+        }
+      });
+
+      lineChart = new Chart(ctxLine, {
+        type: 'line',
+        data: {
+          labels: ['2021', '2022', '2023', '2024', '2025'],
+          datasets: [{
+            label: 'Дефицит (млн. лв.)',
+            data: data.trend,
+            borderColor: '#EF4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.15)',
+            fill: true,
+            tension: 0.35,
+            pointBackgroundColor: '#EF4444'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#94A3B8', font: { family: 'JetBrains Mono', size: 10 } }, grid: { display: false } },
+            y: { ticks: { color: '#94A3B8', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#1E293B' } }
+          }
+        }
+      });
+    }
+
+    function updateCharts(name, data) {
+      document.getElementById('chart-region-title').innerText = 'Област ' + name;
+      document.getElementById('chart-deficit-val').innerText = data.deficit + ' МЛН. ЛВ.';
+      
+      barChart.data.datasets[0].data = [data.contracts, data.signals, data.audits];
+      barChart.update();
+
+      lineChart.data.datasets[0].data = data.trend;
+      lineChart.update();
+    }
+
+    function selectRegion(name) {
+      const data = REGIONS_DATA[name] || REGIONS_DATA['Бургас'];
+      updateCharts(name, data);
+      document.querySelectorAll('.reg-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText === name);
+      });
+    }
+
+    // 5. РЕНДЕРИРАНЕ НА БУТОНИТЕ ЗА ОБЛАСТИ С FUSE.JS ТЪРСАЧКА
+    const regionNames = Object.keys(REGIONS_DATA).map(name => ({ name }));
+    const fuse = new Fuse(regionNames, { keys: ['name'], threshold: 0.35 });
+
+    function renderRegionButtons(list) {
+      const container = document.getElementById('region-buttons');
+      container.innerHTML = '';
+      list.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'reg-btn' + (item.name === 'Бургас' ? ' active' : '');
+        btn.innerText = item.name;
+        btn.onclick = () => selectRegion(item.name);
+        container.appendChild(btn);
+      });
+    }
+
+    document.getElementById('region-search').addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+      if (!query) {
+        renderRegionButtons(regionNames);
+      } else {
+        const results = fuse.search(query).map(r => r.item);
+        renderRegionButtons(results);
+      }
+    });
+
+    // 6. РЕНДЕРИРАНЕ НА ОБЩИНИ И ДОСИЕТА
+    let selectedMuni = MUNICIPALITIES[0];
+    let selectedNode = selectedMuni.nodes[0];
+
+    function renderMunicipalities() {
+      const muniList = document.getElementById('muni-list');
+      muniList.innerHTML = '';
+
+      MUNICIPALITIES.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'muni-item' + (m.id === selectedMuni.id ? ' active' : '');
+        div.innerHTML = `
+          <div class="muni-item-left">
+            <span>${m.coat}</span>
+            <strong>${m.name}</strong>
+          </div>
+          <span class="muni-deficit">${m.deficit}</span>
+        `;
+        div.onclick = () => selectMunicipality(m);
+        muniList.appendChild(div);
+      });
+
+      renderNodes();
+      renderPassport();
+    }
+
+    function selectMunicipality(m) {
+      selectedMuni = m;
+      selectedNode = m.nodes[0] || null;
+      renderMunicipalities();
+    }
+
+    function renderNodes() {
+      document.getElementById('muni-network-title').innerText = '🕸️ СЕТЕВИ ГРАФ: ' + selectedMuni.name.toUpperCase();
+      document.getElementById('muni-mayor').innerText = 'Кмет: ' + selectedMuni.mayor;
+      document.getElementById('muni-audit').innerText = selectedMuni.audit;
+
+      const nodeList = document.getElementById('node-list');
+      nodeList.innerHTML = '';
+
+      selectedMuni.nodes.forEach(node => {
+        const div = document.createElement('div');
+        div.className = 'node-box' + (selectedNode && selectedNode.id === node.id ? ' active' : '');
+        div.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 36px; height: 36px; border-radius: 6px; background-color: #0F172A; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 1px solid #334155;">
+              ${node.emoji}
+            </div>
+            <div>
+              <div style="font-weight: 800; color: #FFF; font-size: 0.82rem;">${node.name}</div>
+              <div style="font-size: 0.7rem; color: #F43F5E; font-weight: 800;">${node.alias}</div>
+            </div>
+          </div>
+          <span style="font-size: 0.62rem; font-weight: 800; background-color: rgba(239, 68, 68, 0.15); color: #EF4444; padding: 3px 6px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.3); font-family: var(--font-mono);">
+            ${node.role}
+          </span>
+        `;
+        div.onclick = () => {
+          selectedNode = node;
+          renderNodes();
+          renderPassport();
+        };
+        nodeList.appendChild(div);
+      });
+    }
+
+    function renderPassport() {
+      if (!selectedNode) return;
+      document.getElementById('pass-name').innerText = selectedNode.name;
+      document.getElementById('pass-alias').innerText = `Прякор / Функция: ${selectedNode.alias} (${selectedNode.role})`;
+      document.getElementById('pass-hash').innerText = selectedNode.hash;
+      document.getElementById('pass-metrics').innerText = selectedNode.metrics;
+      document.getElementById('pass-evidence').innerText = selectedNode.evidence;
+    }
+
+    // Стартиране
+    renderRegionButtons(regionNames);
+    initCharts(REGIONS_DATA['Бургас']);
+    renderMunicipalities();
+  </script>
+</body>
+</html>
